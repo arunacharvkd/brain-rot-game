@@ -735,6 +735,87 @@ a { color: inherit; text-decoration: none; }
   border-radius: inherit;
 }
 
+/* ── Global Footer ─────────────────────────────────────── */
+.global-footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px 20px;
+  background: rgba(5, 6, 15, 0.85);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid var(--border);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+.global-footer-links {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.global-footer-links button,
+.global-footer-links a {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 0;
+  transition: color 0.15s;
+}
+.global-footer-links button:hover,
+.global-footer-links a:hover { color: var(--text); }
+
+/* push screen content above footer */
+.screen { padding-bottom: 52px; }
+
+/* ── Privacy Policy ────────────────────────────────────── */
+.privacy-screen {
+  align-items: flex-start;
+  overflow-y: auto;
+}
+.privacy-container {
+  max-width: 680px;
+  width: 100%;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+.privacy-meta {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 28px;
+}
+.privacy-section {
+  margin-bottom: 28px;
+}
+.privacy-section h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border);
+}
+.privacy-section p {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 10px;
+}
+.privacy-section a {
+  color: var(--purple);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.privacy-section a:hover { color: var(--text); }
+
 /* ── Utilities ─────────────────────────────────────────── */
 .text-mono { font-family: 'JetBrains Mono', monospace; }
 .text-center { text-align: center; }

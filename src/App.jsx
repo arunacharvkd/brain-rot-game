@@ -7,12 +7,14 @@ import Diagnosis from './screens/Diagnosis'
 import ArcadeHub from './screens/ArcadeHub'
 import Game from './screens/Game'
 import FinalResults from './screens/FinalResults'
+import PrivacyPolicy from './screens/PrivacyPolicy'
 import MemoryMatch from './screens/games/MemoryMatch'
 import PatternSimon from './screens/games/PatternSimon'
 import SpeedMath from './screens/games/SpeedMath'
 import BreathFocus from './screens/games/BreathFocus'
 import WordScramble from './screens/games/WordScramble'
 import ColourWord from './screens/games/ColourWord'
+import Footer from './components/Footer'
 
 const SCREENS = {
   landing:        Landing,
@@ -28,6 +30,7 @@ const SCREENS = {
   'game-word':    WordScramble,
   'game-colour':  ColourWord,
   results:        FinalResults,
+  privacy:        PrivacyPolicy,
 }
 
 export default function App() {
@@ -46,6 +49,7 @@ export default function App() {
       <AnimatePresence mode="wait">
         <Screen key={screen} />
       </AnimatePresence>
+      {screen !== 'game' && <Footer />}
     </div>
   )
 }
