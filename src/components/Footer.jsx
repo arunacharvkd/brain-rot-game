@@ -8,7 +8,7 @@ export default function Footer() {
       <span>© 2026 Brain Rot Checker · For entertainment purposes only · Not a medical tool</span>
       <div className="global-footer-links">
         <button onClick={() => setScreen('privacy')}>Privacy Policy</button>
-        <a href="mailto:hello@brainrotchecker.com">Contact</a>
+        <a href="mailto:vkdarunacharya@gmail.com">Contact</a>
       </div>
     </footer>
   )

@@ -125,7 +125,7 @@ export default function PrivacyPolicy() {
           <h2>Contact</h2>
           <p>
             For any questions about this Privacy Policy, contact us at:{' '}
-            <a href="mailto:hello@brainrotchecker.com">hello@brainrotchecker.com</a>
+            <a href="mailto:vkdarunacharya@gmail.com">vkdarunacharya@gmail.com</a>
           </p>
         </section>
 
