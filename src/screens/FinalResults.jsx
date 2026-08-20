@@ -5,7 +5,7 @@ import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
-import { TIERS, calcFinalTier } from '../data/tiers'
+import { TIERS, calcFinalTier, SPONSOR } from '../data/tiers'
 import { useSound } from '../hooks/useSound'
 
 function getVerdict(before, after) {
@@ -135,6 +135,46 @@ export default function FinalResults() {
             Play Again
           </NeonButton>
         </motion.div>
+
+        {SPONSOR.active && (
+          <motion.div
+            {...fadeUp(0.54)}
+            style={{
+              marginTop: 24,
+              padding: '16px 20px',
+              borderRadius: 'var(--r-lg)',
+              border: '1px solid rgba(168,85,247,0.25)',
+              background: 'rgba(168,85,247,0.06)',
+              textAlign: 'center',
+            }}
+          >
+            <p style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginBottom: 6, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
+              Sponsored
+            </p>
+            {SPONSOR.logo && (
+              <img src={SPONSOR.logo} alt={SPONSOR.name} style={{ height: 28, marginBottom: 8 }} />
+            )}
+            <p style={{ fontWeight: 700, fontSize: '1rem', marginBottom: 4 }}>{SPONSOR.name}</p>
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', marginBottom: 12 }}>{SPONSOR.tagline}</p>
+            <a
+              href={SPONSOR.ctaUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                background: 'var(--purple)',
+                color: '#fff',
+                borderRadius: 8,
+                padding: '7px 20px',
+                fontSize: '0.85rem',
+                fontWeight: 600,
+                textDecoration: 'none',
+              }}
+            >
+              {SPONSOR.ctaText}
+            </a>
+          </motion.div>
+        )}
       </GlassCard>
 
       {/* Toast */}

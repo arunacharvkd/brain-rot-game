@@ -4,7 +4,7 @@ import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
-import { TIERS, scoreToTier } from '../data/tiers'
+import { TIERS, scoreToTier, SPONSOR } from '../data/tiers'
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 18 },
@@ -71,6 +71,19 @@ export default function Diagnosis() {
           >
             Start Brain Rehab →
           </NeonButton>
+          {SPONSOR.active && (
+            <p style={{ marginTop: 14, fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center' }}>
+              {SPONSOR.badgeText}{' '}
+              <a
+                href={SPONSOR.ctaUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: 'var(--purple)', textDecoration: 'none', fontWeight: 600 }}
+              >
+                {SPONSOR.name}
+              </a>
+            </p>
+          )}
         </motion.div>
       </GlassCard>
     </motion.div>

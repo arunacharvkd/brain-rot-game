@@ -49,3 +49,14 @@ export function calcFinalTier(diagnosisTier, arcadeScores) {
   const improvement = total >= 200 ? 2 : total >= 80 ? 1 : 0
   return Math.max(0, diagnosisTier - improvement)
 }
+
+// Set active: false to remove all sponsor UI without touching any screen
+export const SPONSOR = {
+  active: false,
+  name: 'YourBrand',
+  tagline: 'Focus better, every day',
+  logo: null,         // set to an image URL or imported asset path
+  ctaText: 'Try it free →',
+  ctaUrl: 'https://yourbrand.com/?ref=brainrot',
+  badgeText: 'Brain Rehab powered by',
+}
