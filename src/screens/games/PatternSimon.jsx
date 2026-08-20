@@ -25,6 +25,7 @@ export default function PatternSimon() {
   const { play } = useSound()
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
+  const navTimerRef = useRef(null)
 
   const clearTimers = () => {
     timersRef.current.forEach(clearTimeout)
@@ -77,7 +78,7 @@ export default function PatternSimon() {
       play('buzz')
       setPhase('wrong')
       setArcadeScore('simon', score)
-      setTimeout(() => setScreen('arcade'), 2400)
+      navTimerRef.current = setTimeout(() => setScreen('arcade'), 2400)
       return
     }
 
@@ -90,7 +91,7 @@ export default function PatternSimon() {
         // Game complete
         setPhase('done')
         setArcadeScore('simon', newScore)
-        setTimeout(() => setScreen('arcade'), 2400)
+        navTimerRef.current = setTimeout(() => setScreen('arcade'), 2400)
       } else {
         setPhase('win_round')
         setTimeout(() => startRound(sequence), 900)
@@ -99,6 +100,29 @@ export default function PatternSimon() {
   }
 
   const displayRound = round
+
+  const handlePlayAgain = () => {
+    clearTimeout(navTimerRef.current)
+    clearTimers()
+    setSequence([])
+    setPlayerSeq([])
+    setActiveBtn(-1)
+    setRound(0)
+    setScore(0)
+    setPhase('intro')
+  }
+
+  // keyboard: 1-4 presses the corresponding Simon button
+  useEffect(() => {
+    if (phase !== 'inputting') return
+    const handler = (e) => {
+      const idx = parseInt(e.key, 10) - 1
+      if (idx >= 0 && idx < BUTTONS.length) handleButtonClick(idx)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, playerSeq])
 
   return (
     <motion.div
@@ -184,6 +208,17 @@ export default function PatternSimon() {
                       {phase === 'done' ? 'Sequence Master!' : `Reached Round ${displayRound}`}
                     </div>
                     <div className="text-mono text-muted text-sm">Score: {score} pts</div>
+                    <button
+                      onClick={handlePlayAgain}
+                      style={{
+                        marginTop: 12, background: 'none',
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        borderRadius: 8, color: '#fff', fontSize: '0.85rem',
+                        padding: '5px 16px', cursor: 'pointer',
+                      }}
+                    >
+                      ↩ Play Again
+                    </button>
                   </motion.div>
                 </AnimatePresence>
               )}

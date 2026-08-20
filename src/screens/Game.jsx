@@ -110,6 +110,16 @@ export default function Game() {
     setItems((prev) => prev.filter((i) => i.id !== id))
   }, [])
 
+  const handlePlayAgain = () => {
+    setItems([])
+    setScore(0)
+    scoreRef.current = 0
+    setTimeLeft(ROUND_TIME)
+    setRound(1)
+    setPops([])
+    setRoundPhase('playing') // triggers done-effect cleanup, cancelling auto-nav
+  }
+
   const timerPct = (timeLeft / ROUND_TIME) * 100
   const timerColor =
     timerPct > 50 ? 'var(--green)' : timerPct > 25 ? 'var(--yellow)' : 'var(--red)'
@@ -206,6 +216,19 @@ export default function Game() {
               <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: 8 }}>
                 Next round starting...
               </div>
+            )}
+            {roundPhase === 'done' && (
+              <button
+                onClick={handlePlayAgain}
+                style={{
+                  marginTop: 14, background: 'none',
+                  border: '1px solid rgba(255,255,255,0.25)',
+                  borderRadius: 8, color: '#fff', fontSize: '0.9rem',
+                  padding: '6px 18px', cursor: 'pointer',
+                }}
+              >
+                ↩ Play Again
+              </button>
             )}
           </motion.div>
         )}

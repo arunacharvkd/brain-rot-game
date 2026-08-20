@@ -24,6 +24,7 @@ export default function BreathFocus() {
   const { play } = useSound()
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
+  const navTimerRef = useRef(null)
 
   // Animate progress 0→1 within each phase using rAF
   useEffect(() => {
@@ -56,7 +57,7 @@ export default function BreathFocus() {
       if (phaseIndex + 1 >= TOTAL_PHASES) {
         setPhase('done')
         setArcadeScore('breath', score)
-        setTimeout(() => setScreen('arcade'), 2600)
+        navTimerRef.current = setTimeout(() => setScreen('arcade'), 2600)
       } else {
         setPhaseIndex((i) => i + 1)
         setCyclePhase((p) => (p === 'inhale' ? 'exhale' : 'inhale'))
@@ -120,6 +121,27 @@ export default function BreathFocus() {
             <p className="text-muted text-sm" style={{ marginTop: 8 }}>
               You completed {completedCycles} breath cycles 🧘
             </p>
+            <button
+              onClick={() => {
+                clearTimeout(navTimerRef.current)
+                cancelAnimationFrame(rafRef.current)
+                setCyclePhase('inhale')
+                setPhaseIndex(0)
+                setShowTap(false)
+                setTapped(false)
+                setScore(0)
+                setProgress(0)
+                setPhase('intro')
+              }}
+              style={{
+                marginTop: 16, background: 'none',
+                border: '1px solid rgba(255,255,255,0.25)',
+                borderRadius: 8, color: '#fff', fontSize: '0.9rem',
+                padding: '6px 18px', cursor: 'pointer',
+              }}
+            >
+              ↩ Play Again
+            </button>
           </div>
         ) : (
           <div style={{ textAlign: 'center' }}>

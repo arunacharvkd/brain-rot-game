@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
@@ -34,6 +34,18 @@ export default function Quiz() {
     }, 360)
   }
 
+  // keyboard: 1-4 selects the nth option
+  useEffect(() => {
+    const handler = (e) => {
+      if (selected !== null) return
+      const idx = parseInt(e.key, 10) - 1
+      if (idx >= 0 && idx < question.options.length) handleSelect(question.options[idx].score)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [qIndex, selected])
+
   return (
     <motion.div
       className="screen"
@@ -49,6 +61,7 @@ export default function Quiz() {
             style={{
               display: 'flex',
               justifyContent: 'space-between',
+              alignItems: 'center',
               marginBottom: 8,
               fontSize: '0.78rem',
               color: 'var(--text-muted)',
@@ -56,7 +69,23 @@ export default function Quiz() {
             className="text-mono"
           >
             <span>Question {qIndex + 1} / {QUESTIONS.length}</span>
-            <span>Brain Rot Quiz</span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+              <span>Brain Rot Quiz</span>
+              <button
+                onClick={() => setScreen('landing')}
+                style={{
+                  background: 'none',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 6,
+                  color: 'var(--text-muted)',
+                  fontSize: '0.7rem',
+                  padding: '2px 8px',
+                  cursor: 'pointer',
+                }}
+              >
+                ✕ Exit
+              </button>
+            </div>
           </div>
           <div className="progress-track">
             <div className="progress-fill" style={{ width: `${progressPct}%` }} />

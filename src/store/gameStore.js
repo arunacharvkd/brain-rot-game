@@ -10,14 +10,16 @@ const useGameStore = create(
       diagnosisTier: 0,
       arcadeScores: {}, // { gameId: score }
       finalTier: 0,
+      muted: false,
 
       setScreen: (screen) => set({ screen }),
       setQuizScore: (quizScore) => set({ quizScore }),
       setReactionScore: (reactionScore) => set({ reactionScore }),
       setDiagnosisTier: (diagnosisTier) => set({ diagnosisTier }),
       setArcadeScore: (id, score) =>
-        set((s) => ({ arcadeScores: { ...s.arcadeScores, [id]: score } })),
+        set((s) => ({ arcadeScores: { ...s.arcadeScores, [id]: Math.max(score, s.arcadeScores[id] ?? 0) } })),
       setFinalTier: (finalTier) => set({ finalTier }),
+      toggleMute: () => set((s) => ({ muted: !s.muted })),
 
       reset: () =>
         set({
@@ -38,6 +40,7 @@ const useGameStore = create(
         diagnosisTier: s.diagnosisTier,
         arcadeScores: s.arcadeScores,
         finalTier: s.finalTier,
+        muted: s.muted,
       }),
     }
   )

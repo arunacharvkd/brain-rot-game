@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
@@ -32,6 +32,7 @@ export default function MemoryMatch() {
   const { play } = useSound()
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
+  const navTimerRef = useRef(null)
 
   // Timer
   useEffect(() => {
@@ -53,8 +54,19 @@ export default function MemoryMatch() {
     setPhase('done')
     play('win')
     setArcadeScore('memory', s)
-    setTimeout(() => setScreen('arcade'), 2600)
+    navTimerRef.current = setTimeout(() => setScreen('arcade'), 2600)
   }, [phase, timeLeft, play, setArcadeScore, setScreen])
+
+  const handlePlayAgain = () => {
+    clearTimeout(navTimerRef.current)
+    setCards(initCards())
+    setFlipped([])
+    setMatchedCount(0)
+    setTimeLeft(TIME)
+    setScore(0)
+    setLocked(false)
+    setPhase('intro')
+  }
 
   const handleCardClick = (card) => {
     if (phase !== 'playing' || locked || card.flipped || card.matched) return
@@ -170,6 +182,17 @@ export default function MemoryMatch() {
                     <div className="text-mono" style={{ color: 'var(--text-muted)' }}>
                       Score: {score} pts
                     </div>
+                    <button
+                      onClick={handlePlayAgain}
+                      style={{
+                        marginTop: 12, background: 'none',
+                        border: '1px solid rgba(255,255,255,0.25)',
+                        borderRadius: 8, color: '#fff', fontSize: '0.85rem',
+                        padding: '5px 16px', cursor: 'pointer',
+                      }}
+                    >
+                      ↩ Play Again
+                    </button>
                   </motion.div>
                 )}
               </AnimatePresence>

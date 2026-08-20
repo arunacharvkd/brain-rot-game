@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
@@ -37,6 +37,7 @@ export default function SpeedMath() {
   const { play } = useSound()
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
+  const navTimerRef = useRef(null)
 
   const advance = useCallback((correct) => {
     if (locked) return
@@ -50,7 +51,7 @@ export default function SpeedMath() {
       if (qIndex + 1 >= TOTAL) {
         setPhase('done')
         setArcadeScore('math', newScore)
-        setTimeout(() => setScreen('arcade'), 2400)
+        navTimerRef.current = setTimeout(() => setScreen('arcade'), 2400)
       } else {
         setQIndex((i) => i + 1)
         setQuestion(makeQuestion())
@@ -60,6 +61,29 @@ export default function SpeedMath() {
       }
     }, 500)
   }, [locked, score, qIndex, play, setArcadeScore, setScreen])
+
+  const handlePlayAgain = () => {
+    clearTimeout(navTimerRef.current)
+    setPhase('intro')
+    setQIndex(0)
+    setQuestion(makeQuestion())
+    setTimeLeft(Q_TIME)
+    setScore(0)
+    setFeedback(null)
+    setLocked(false)
+  }
+
+  // keyboard: 1-4 selects the nth answer option
+  useEffect(() => {
+    if (phase !== 'playing') return
+    const handler = (e) => {
+      const idx = parseInt(e.key, 10) - 1
+      if (idx >= 0 && idx < question.options.length) advance(question.options[idx] === question.answer)
+    }
+    window.addEventListener('keydown', handler)
+    return () => window.removeEventListener('keydown', handler)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase, question])
 
   // Per-question timer
   useEffect(() => {
@@ -103,6 +127,17 @@ export default function SpeedMath() {
             <p className="text-mono" style={{ fontSize: '1.5rem', color: 'var(--green)', fontWeight: 700 }}>
               {score} / {TOTAL * 10} pts
             </p>
+            <button
+              onClick={handlePlayAgain}
+              style={{
+                marginTop: 16, background: 'none',
+                border: '1px solid rgba(255,255,255,0.25)',
+                borderRadius: 8, color: '#fff', fontSize: '0.9rem',
+                padding: '6px 18px', cursor: 'pointer',
+              }}
+            >
+              ↩ Play Again
+            </button>
           </div>
         ) : (
           <>

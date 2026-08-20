@@ -14,7 +14,7 @@ export default function Landing() {
   const setScreen = useGameStore((s) => s.setScreen)
   const hasPriorScore = useGameStore((s) => s.quizScore > 0)
   const diagnosisDone = useGameStore((s) => s.diagnosisTier > 0 || s.quizScore > 0)
-  const gameDone = useGameStore((s) => s.gameScore > 0)
+  const gameDone = useGameStore((s) => Object.keys(s.arcadeScores).length > 0)
   const reset = useGameStore((s) => s.reset)
 
   return (

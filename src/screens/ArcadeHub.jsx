@@ -54,7 +54,7 @@ export default function ArcadeHub() {
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-            {gamesPlayed > 0 && (
+            {gamesPlayed === GAMES.length && (
               <NeonButton onClick={() => setScreen('results')} variant="green" size="sm">
                 See Results →
               </NeonButton>
@@ -87,7 +87,7 @@ export default function ArcadeHub() {
                       <span style={{ fontSize: '2rem', lineHeight: 1 }}>{game.emoji}</span>
                       {played && (
                         <span className="tier-chip tier-0" style={{ fontSize: '0.7rem' }}>
-                          ✓ {score} pts
+                          Best: {score} pts
                         </span>
                       )}
                     </div>

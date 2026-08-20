@@ -1,4 +1,5 @@
 import { useCallback } from 'react'
+import useGameStore from '../store/gameStore'
 
 // Lazily created singleton so it's only made after a user gesture
 let _ctx = null
@@ -26,7 +27,9 @@ function tone(ctx, type, freq, duration, vol = 0.22, offset = 0) {
 }
 
 export function useSound() {
+  const muted = useGameStore((s) => s.muted)
   const play = useCallback((sound) => {
+    if (muted) return
     const ctx = getCtx()
     if (!ctx) return
     if (ctx.state === 'suspended') ctx.resume()
@@ -57,7 +60,7 @@ export function useSound() {
       default:
         break
     }
-  }, [])
+  }, [muted])
 
   return { play }
 }

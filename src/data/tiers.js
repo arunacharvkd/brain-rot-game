@@ -46,6 +46,6 @@ export function scoreToTier(total) {
 
 export function calcFinalTier(diagnosisTier, arcadeScores) {
   const total = Object.values(arcadeScores).reduce((a, b) => a + b, 0)
-  const improvement = total >= 400 ? 2 : total >= 150 ? 1 : 0
+  const improvement = total >= 200 ? 2 : total >= 80 ? 1 : 0
   return Math.max(0, diagnosisTier - improvement)
 }

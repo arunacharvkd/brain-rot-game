@@ -35,21 +35,37 @@ const SCREENS = {
 
 export default function App() {
   const screen = useGameStore((s) => s.screen)
+  const muted = useGameStore((s) => s.muted)
+  const toggleMute = useGameStore((s) => s.toggleMute)
   const Screen = SCREENS[screen] ?? Landing
+  const isGameScreen = screen === 'game' || screen.startsWith('game-')
 
   return (
     <div className="app">
-      {/* Animated background only for non-game screens */}
-      {screen !== 'game' && (
+      {!isGameScreen && (
         <>
           <div className="bg-orb bg-orb-1" />
           <div className="bg-orb bg-orb-2" />
         </>
       )}
+      <button
+        onClick={toggleMute}
+        title={muted ? 'Unmute' : 'Mute'}
+        style={{
+          position: 'fixed', top: 14, right: 16, zIndex: 1000,
+          background: 'rgba(255,255,255,0.06)',
+          border: '1px solid rgba(255,255,255,0.12)',
+          borderRadius: 8, color: muted ? 'var(--text-muted)' : '#fff',
+          fontSize: '1.1rem', padding: '5px 10px', cursor: 'pointer',
+          backdropFilter: 'blur(4px)',
+        }}
+      >
+        {muted ? '🔇' : '🔊'}
+      </button>
       <AnimatePresence mode="wait">
         <Screen key={screen} />
       </AnimatePresence>
-      {screen !== 'game' && <Footer />}
+      {!isGameScreen && <Footer />}
     </div>
   )
 }

@@ -59,8 +59,15 @@ export default function FinalResults() {
   const verdict = getVerdict(diagnosisTier, finalTier)
 
   const handleShare = async () => {
+    const text = getShareText(diagnosisTier, finalTier, totalScore, gamesPlayed)
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: 'Brain Rot Test Results', text })
+        return
+      } catch {}
+    }
     try {
-      await navigator.clipboard.writeText(getShareText(diagnosisTier, finalTier, totalScore, gamesPlayed))
+      await navigator.clipboard.writeText(text)
       setCopied(true)
       setTimeout(() => setCopied(false), 2400)
     } catch {
