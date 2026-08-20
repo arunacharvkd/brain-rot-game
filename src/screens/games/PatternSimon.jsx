@@ -123,11 +123,25 @@ export default function PatternSimon() {
           </div>
         ) : (
           <>
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 20 }}>
               <span className="text-mono text-sm text-muted">Round {displayRound}</span>
-              <span className="text-mono text-sm" style={{ color: 'var(--green)', marginLeft: 16 }}>
+              <span className="text-mono text-sm" style={{ color: 'var(--green)' }}>
                 {score} pts
               </span>
+              <button
+                onClick={() => setScreen('arcade')}
+                style={{
+                  background: 'none',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 6,
+                  color: 'var(--text-muted)',
+                  fontSize: '0.72rem',
+                  padding: '2px 9px',
+                  cursor: 'pointer',
+                }}
+              >
+                ✕ Quit
+              </button>
             </div>
 
             <div className="simon-grid">

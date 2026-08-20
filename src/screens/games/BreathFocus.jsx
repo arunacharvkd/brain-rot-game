@@ -124,8 +124,24 @@ export default function BreathFocus() {
         ) : (
           <div style={{ textAlign: 'center' }}>
             {/* Cycle counter */}
-            <div className="text-mono text-muted text-xs" style={{ marginBottom: 8 }}>
-              Cycle {completedCycles + 1} / {TOTAL_PHASES / 2}  ·  {score} pts
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 8 }}>
+              <span className="text-mono text-muted text-xs">
+                Cycle {completedCycles + 1} / {TOTAL_PHASES / 2}  ·  {score} pts
+              </span>
+              <button
+                onClick={() => setScreen('arcade')}
+                style={{
+                  background: 'none',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 6,
+                  color: 'var(--text-muted)',
+                  fontSize: '0.72rem',
+                  padding: '2px 9px',
+                  cursor: 'pointer',
+                }}
+              >
+                ✕ Quit
+              </button>
             </div>
 
             {/* Breathing arena */}

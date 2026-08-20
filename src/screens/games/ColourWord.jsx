@@ -121,6 +121,21 @@ export default function ColourWord() {
                 />
               </div>
               <span className="text-mono text-xs" style={{ color: 'var(--green)' }}>{score} pts</span>
+              <button
+                onClick={() => setScreen('arcade')}
+                style={{
+                  background: 'none',
+                  border: '1px solid rgba(255,255,255,0.15)',
+                  borderRadius: 6,
+                  color: 'var(--text-muted)',
+                  fontSize: '0.72rem',
+                  padding: '2px 9px',
+                  cursor: 'pointer',
+                  flexShrink: 0,
+                }}
+              >
+                ✕ Quit
+              </button>
             </div>
 
             <AnimatePresence mode="wait">
