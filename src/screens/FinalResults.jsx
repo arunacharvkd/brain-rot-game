@@ -41,6 +41,7 @@ export default function FinalResults() {
   const diagnosisTier = useGameStore((s) => s.diagnosisTier)
   const arcadeScores = useGameStore((s) => s.arcadeScores)
   const setFinalTier = useGameStore((s) => s.setFinalTier)
+  const setScreen = useGameStore((s) => s.setScreen)
   const finalTier = useGameStore((s) => s.finalTier)
   const reset = useGameStore((s) => s.reset)
   const { play } = useSound()
@@ -84,6 +85,23 @@ export default function FinalResults() {
       transition={{ duration: 0.32 }}
     >
       <GlassCard glow style={{ maxWidth: 540, width: '100%', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 8 }}>
+          <button
+            onClick={() => setScreen('arcade')}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 7,
+              color: 'var(--text-muted)',
+              fontSize: '0.74rem',
+              padding: '4px 10px',
+              cursor: 'pointer',
+            }}
+          >
+            ← Back to Arcade
+          </button>
+        </div>
+
         <motion.h1
           className="results-title"
           initial={{ scale: 0.7, opacity: 0 }}

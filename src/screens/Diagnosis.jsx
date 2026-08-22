@@ -36,6 +36,23 @@ export default function Diagnosis() {
       transition={{ duration: 0.32 }}
     >
       <GlassCard glow style={{ maxWidth: 480, width: '100%', textAlign: 'center' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 8 }}>
+          <button
+            onClick={() => setScreen('reaction')}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 7,
+              color: 'var(--text-muted)',
+              fontSize: '0.74rem',
+              padding: '4px 10px',
+              cursor: 'pointer',
+            }}
+          >
+            ← Back
+          </button>
+        </div>
+
         <motion.span
           className="diag-emoji"
           initial={{ scale: 0, rotate: -20 }}

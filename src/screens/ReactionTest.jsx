@@ -111,6 +111,23 @@ export default function ReactionTest() {
       transition={{ duration: 0.32 }}
     >
       <GlassCard style={{ maxWidth: 560, width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 12 }}>
+          <button
+            onClick={() => setScreen('quiz')}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 7,
+              color: 'var(--text-muted)',
+              fontSize: '0.74rem',
+              padding: '4px 10px',
+              cursor: 'pointer',
+            }}
+          >
+            ← Back to Quiz
+          </button>
+        </div>
+
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 6 }}>
             Part 2: Prove You're Not an NPC

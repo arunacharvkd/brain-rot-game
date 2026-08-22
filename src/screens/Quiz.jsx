@@ -55,6 +55,23 @@ export default function Quiz() {
       transition={{ duration: 0.32 }}
     >
       <GlassCard style={{ maxWidth: 560, width: '100%' }}>
+        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 12 }}>
+          <button
+            onClick={() => setScreen('landing')}
+            style={{
+              background: 'none',
+              border: '1px solid rgba(255,255,255,0.15)',
+              borderRadius: 7,
+              color: 'var(--text-muted)',
+              fontSize: '0.74rem',
+              padding: '4px 10px',
+              cursor: 'pointer',
+            }}
+          >
+            ← Back
+          </button>
+        </div>
+
         {/* Progress bar */}
         <div style={{ marginBottom: 28 }}>
           <div
