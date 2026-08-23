@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import NeonButton from './NeonButton'
+import { trackEvent } from '../lib/analytics'
 
 const INSTALL_GUIDES = {
   desktop: [
@@ -47,6 +48,7 @@ export default function PwaInstallCard() {
     const onBeforeInstallPrompt = (event) => {
       event.preventDefault()
       setDeferredPrompt(event)
+      trackEvent('pwa_install_prompt_ready')
     }
 
     const onInstalled = () => {
@@ -54,6 +56,7 @@ export default function PwaInstallCard() {
       setDeferredPrompt(null)
       setShowGuide(false)
       setToastText('App installed successfully.')
+      trackEvent('pwa_installed')
     }
 
     window.addEventListener('beforeinstallprompt', onBeforeInstallPrompt)
@@ -75,6 +78,7 @@ export default function PwaInstallCard() {
     if (!deferredPrompt) return
 
     setStatus('waiting')
+    trackEvent('pwa_install_clicked')
     deferredPrompt.prompt()
     const choice = await deferredPrompt.userChoice
     setDeferredPrompt(null)
@@ -83,11 +87,13 @@ export default function PwaInstallCard() {
       setStatus('installed')
       setShowGuide(false)
       setToastText('App installed successfully.')
+      trackEvent('pwa_install_choice', { outcome: 'accepted' })
       return
     }
 
     setStatus('dismissed')
     setToastText('Install canceled. You can try again anytime.')
+    trackEvent('pwa_install_choice', { outcome: 'dismissed' })
   }
 
   return (
@@ -130,19 +136,28 @@ export default function PwaInstallCard() {
           <div className="landing-install-guide-switch">
             <button
               className={activeGuide === 'desktop' ? 'is-active' : ''}
-              onClick={() => setActiveGuide('desktop')}
+              onClick={() => {
+                setActiveGuide('desktop')
+                trackEvent('pwa_install_guide_selected', { platform: 'desktop' })
+              }}
             >
               Desktop
             </button>
             <button
               className={activeGuide === 'android' ? 'is-active' : ''}
-              onClick={() => setActiveGuide('android')}
+              onClick={() => {
+                setActiveGuide('android')
+                trackEvent('pwa_install_guide_selected', { platform: 'android' })
+              }}
             >
               Android
             </button>
             <button
               className={activeGuide === 'ios' ? 'is-active' : ''}
-              onClick={() => setActiveGuide('ios')}
+              onClick={() => {
+                setActiveGuide('ios')
+                trackEvent('pwa_install_guide_selected', { platform: 'ios' })
+              }}
             >
               iPhone/iPad
             </button>

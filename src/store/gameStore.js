@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { trackEvent, trackGameStart, trackGameComplete } from '../lib/analytics'
 
 const useGameStore = create(
   persist(
@@ -12,12 +13,27 @@ const useGameStore = create(
       finalTier: 0,
       muted: false,
 
-      setScreen: (screen) => set({ screen }),
+      setScreen: (screen) =>
+        set((s) => {
+          if (s.screen !== screen) {
+            trackEvent('screen_navigate', {
+              from_screen: s.screen,
+              to_screen: screen,
+            })
+            trackGameStart(screen, s.screen)
+          }
+          return { screen }
+        }),
       setQuizScore: (quizScore) => set({ quizScore }),
       setReactionScore: (reactionScore) => set({ reactionScore }),
       setDiagnosisTier: (diagnosisTier) => set({ diagnosisTier }),
       setArcadeScore: (id, score) =>
-        set((s) => ({ arcadeScores: { ...s.arcadeScores, [id]: Math.max(score, s.arcadeScores[id] ?? 0) } })),
+        set((s) => {
+          const previousBest = s.arcadeScores[id]
+          const nextBest = Math.max(score, previousBest ?? 0)
+          trackGameComplete(id, score, previousBest)
+          return { arcadeScores: { ...s.arcadeScores, [id]: nextBest } }
+        }),
       setFinalTier: (finalTier) => set({ finalTier }),
       toggleMute: () => set((s) => ({ muted: !s.muted })),
 

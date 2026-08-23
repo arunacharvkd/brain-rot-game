@@ -4,6 +4,7 @@ import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import { QUESTIONS } from '../data/questions'
 import { useSound } from '../hooks/useSound'
+import { trackEvent } from '../lib/analytics'
 
 export default function Quiz() {
   const [qIndex, setQIndex] = useState(0)
@@ -15,6 +16,10 @@ export default function Quiz() {
 
   const question = QUESTIONS[qIndex]
   const progressPct = (qIndex / QUESTIONS.length) * 100
+
+  useEffect(() => {
+    trackEvent('quiz_started', { question_count: QUESTIONS.length })
+  }, [])
 
   const handleSelect = (score) => {
     if (selected !== null) return
@@ -29,6 +34,10 @@ export default function Quiz() {
         setSelected(null)
       } else {
         setQuizScore(next)
+        trackEvent('quiz_completed', {
+          quiz_score: next,
+          question_count: QUESTIONS.length,
+        })
         setScreen('reaction')
       }
     }, 360)

@@ -3,6 +3,7 @@ import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
 import PwaInstallCard from '../components/PwaInstallCard'
 import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
+import { trackEvent } from '../lib/analytics'
 
 function getSponsorMeta(item) {
   const url = (item.url || '').toLowerCase()
@@ -69,7 +70,10 @@ export default function Landing() {
               {(SPONSOR.active || activeSupportingSponsors.length > 0) && <button onClick={() => scrollTo('sponsor')}>Sponsor</button>}
               <button onClick={() => scrollTo('contact')}>Contact</button>
             </div>
-            <button className="landing-topbar-cta" onClick={() => setScreen('quiz')}>
+            <button className="landing-topbar-cta" onClick={() => {
+              trackEvent('landing_cta_clicked', { cta: 'start_test_topbar' })
+              setScreen('quiz')
+            }}>
               Start Test
             </button>
           </div>
@@ -93,12 +97,18 @@ export default function Landing() {
                 </div>
 
                 <div className="landing-cta-row">
-                  <NeonButton onClick={() => setScreen('quiz')} variant="green">
+                  <NeonButton onClick={() => {
+                    trackEvent('landing_cta_clicked', { cta: 'start_diagnosis' })
+                    setScreen('quiz')
+                  }} variant="green">
                     {diagnosisDone ? 'Retake Diagnosis' : 'Start Diagnosis'}
                   </NeonButton>
 
                   {diagnosisDone && (
-                    <NeonButton onClick={() => setScreen('arcade')} variant="purple">
+                    <NeonButton onClick={() => {
+                      trackEvent('landing_cta_clicked', { cta: 'jump_into_rehab' })
+                      setScreen('arcade')
+                    }} variant="purple">
                       Jump Into Rehab
                     </NeonButton>
                   )}
@@ -110,11 +120,17 @@ export default function Landing() {
                   )}
 
                   {gameDone && (
-                    <button onClick={() => setScreen('results')}>See your latest results</button>
+                    <button onClick={() => {
+                      trackEvent('landing_cta_clicked', { cta: 'see_latest_results' })
+                      setScreen('results')
+                    }}>See your latest results</button>
                   )}
 
                   {hasPriorScore && (
-                    <button className="landing-reset" onClick={reset}>
+                    <button className="landing-reset" onClick={() => {
+                      trackEvent('progress_reset_clicked')
+                      reset()
+                    }}>
                       Reset progress
                     </button>
                   )}

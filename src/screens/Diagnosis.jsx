@@ -5,6 +5,7 @@ import GlassCard from '../components/GlassCard'
 import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
 import { TIERS, scoreToTier, SPONSOR } from '../data/tiers'
+import { trackEvent } from '../lib/analytics'
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 18 },
@@ -22,7 +23,15 @@ export default function Diagnosis() {
   const totalScore = quizScore + reactionScore
 
   useEffect(() => {
-    setDiagnosisTier(scoreToTier(totalScore))
+    const computedTier = scoreToTier(totalScore)
+    setDiagnosisTier(computedTier)
+    trackEvent('diagnosis_generated', {
+      diagnosis_tier: computedTier,
+      diagnosis_label: TIERS[computedTier]?.label,
+      quiz_score: quizScore,
+      reaction_score: reactionScore,
+      total_score: totalScore,
+    })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const tier = TIERS[diagnosisTier]

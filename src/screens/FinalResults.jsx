@@ -7,6 +7,7 @@ import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
 import { TIERS, calcFinalTier, SPONSOR } from '../data/tiers'
 import { useSound } from '../hooks/useSound'
+import { trackEvent } from '../lib/analytics'
 
 function getVerdict(before, after) {
   if (after < before) {
@@ -53,6 +54,13 @@ export default function FinalResults() {
   useEffect(() => {
     const computed = calcFinalTier(diagnosisTier, arcadeScores)
     setFinalTier(computed)
+    trackEvent('rehab_completed', {
+      diagnosis_tier: diagnosisTier,
+      final_tier: computed,
+      total_score: totalScore,
+      games_played: gamesPlayed,
+      tier_improvement: Math.max(0, diagnosisTier - computed),
+    })
     play('win')
     confetti({ particleCount: 220, spread: 110, origin: { y: 0.58 } })
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
@@ -64,11 +72,13 @@ export default function FinalResults() {
     if (navigator.share) {
       try {
         await navigator.share({ title: 'Brain Rot Test Results', text })
+        trackEvent('result_shared', { method: 'native_share' })
         return
       } catch {}
     }
     try {
       await navigator.clipboard.writeText(text)
+      trackEvent('result_shared', { method: 'clipboard' })
       setCopied(true)
       setTimeout(() => setCopied(false), 2400)
     } catch {

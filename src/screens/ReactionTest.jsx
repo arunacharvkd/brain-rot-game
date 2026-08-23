@@ -4,6 +4,7 @@ import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import NeonButton from '../components/NeonButton'
 import { useSound } from '../hooks/useSound'
+import { trackEvent } from '../lib/analytics'
 
 const TOTAL_ROUNDS = 5
 const DISTRACTORS = ['📱', '🤡', '📺', '💀', '🎮']
@@ -95,7 +96,13 @@ export default function ReactionTest() {
         setPhase('countdown')
       } else {
         const avg = newTimes.reduce((a, b) => a + b, 0) / newTimes.length
-        setReactionScore(msToScore(avg))
+        const reactionScore = msToScore(avg)
+        setReactionScore(reactionScore)
+        trackEvent('reaction_test_completed', {
+          rounds: TOTAL_ROUNDS,
+          avg_reaction_ms: Math.round(avg),
+          reaction_score: reactionScore,
+        })
         setPhase('complete')
         setTimeout(() => setScreen('diagnosis'), 1600)
       }
@@ -241,7 +248,11 @@ export default function ReactionTest() {
         {/* CTA / times row */}
         <div style={{ marginTop: 24, textAlign: 'center' }}>
           {phase === 'intro' && (
-            <NeonButton onClick={() => { setCountdown(3); setPhase('countdown') }} variant="purple">
+            <NeonButton onClick={() => {
+              trackEvent('reaction_test_started', { rounds: TOTAL_ROUNDS })
+              setCountdown(3)
+              setPhase('countdown')
+            }} variant="purple">
               Start Reaction Test →
             </NeonButton>
           )}

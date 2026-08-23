@@ -1,4 +1,5 @@
 import { AnimatePresence } from 'framer-motion'
+import { useEffect, useRef } from 'react'
 import useGameStore from './store/gameStore'
 import Landing from './screens/Landing'
 import Quiz from './screens/Quiz'
@@ -17,6 +18,7 @@ import ColourWord from './screens/games/ColourWord'
 import OddOneOut from './screens/games/OddOneOut'
 import TapOrder from './screens/games/TapOrder'
 import Footer from './components/Footer'
+import { trackEvent, trackScreenView } from './lib/analytics'
 
 const SCREENS = {
   landing:        Landing,
@@ -40,9 +42,32 @@ const SCREENS = {
 export default function App() {
   const screen = useGameStore((s) => s.screen)
   const muted = useGameStore((s) => s.muted)
+  const quizScore = useGameStore((s) => s.quizScore)
+  const reactionScore = useGameStore((s) => s.reactionScore)
+  const diagnosisTier = useGameStore((s) => s.diagnosisTier)
+  const arcadeScores = useGameStore((s) => s.arcadeScores)
   const toggleMute = useGameStore((s) => s.toggleMute)
   const Screen = SCREENS[screen] ?? Landing
   const isGameScreen = screen === 'game' || screen.startsWith('game-')
+  const hasTrackedSessionRef = useRef(false)
+
+  useEffect(() => {
+    if (hasTrackedSessionRef.current) return
+    const hasHistory =
+      quizScore > 0 ||
+      reactionScore > 0 ||
+      diagnosisTier > 0 ||
+      Object.keys(arcadeScores).length > 0
+
+    trackEvent('app_session_started', {
+      user_type: hasHistory ? 'returning' : 'new',
+    })
+    hasTrackedSessionRef.current = true
+  }, [quizScore, reactionScore, diagnosisTier, arcadeScores])
+
+  useEffect(() => {
+    trackScreenView(screen)
+  }, [screen])
 
   return (
     <div className="app">
