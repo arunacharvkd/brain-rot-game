@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
+import PwaInstallCard from '../components/PwaInstallCard'
 import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
 
 function getSponsorMeta(item) {
@@ -54,7 +55,7 @@ export default function Landing() {
       <div className="landing-shell">
         <motion.div className="landing-topbar" {...fadeUp(0.06)}>
           <div className="landing-brand-wrap">
-            <div className="landing-brand-dot" />
+            <img src="/ta-logo.svg" alt="TA logo" className="landing-brand-logo" />
             <div>
               <div className="landing-brand">BrainRotChecker</div>
               <div className="landing-brand-sub">focus diagnostics + rehab arcade</div>
@@ -63,6 +64,7 @@ export default function Landing() {
           <div className="landing-nav-actions">
             <div className="landing-links">
               <button onClick={() => scrollTo('home')}>Home</button>
+              <button onClick={() => scrollTo('install')}>Install App</button>
               <button onClick={() => scrollTo('about')}>About</button>
               {(SPONSOR.active || activeSupportingSponsors.length > 0) && <button onClick={() => scrollTo('sponsor')}>Sponsor</button>}
               <button onClick={() => scrollTo('contact')}>Contact</button>
@@ -155,6 +157,12 @@ export default function Landing() {
                 </a>
               </div>
             )}
+          </div>
+        </section>
+
+        <section id="install" className="landing-section">
+          <div className="landing-block">
+            <PwaInstallCard />
           </div>
         </section>
 

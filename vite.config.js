@@ -1,5 +1,6 @@
 import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
 import feedbackHandler from './api/feedback.js'
 
 function feedbackApiDevPlugin() {
@@ -62,6 +63,102 @@ export default defineConfig(({ mode }) => {
   Object.assign(process.env, loadEnv(mode, process.cwd(), ''))
 
   return {
-    plugins: [react(), feedbackApiDevPlugin()],
+    plugins: [
+      react(),
+      feedbackApiDevPlugin(),
+      VitePWA({
+        registerType: 'autoUpdate',
+        includeAssets: ['favicon.svg', 'apple-touch-icon.svg'],
+        workbox: {
+          cleanupOutdatedCaches: true,
+          clientsClaim: true,
+          skipWaiting: true,
+          navigateFallbackDenylist: [/^\/api\//],
+          runtimeCaching: [
+            {
+              urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'google-fonts-stylesheets',
+                expiration: {
+                  maxEntries: 10,
+                  maxAgeSeconds: 60 * 60 * 24 * 365,
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/fonts\.gstatic\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'google-fonts-webfonts',
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 60 * 60 * 24 * 365,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/images\.unsplash\.com\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'landing-images',
+                expiration: {
+                  maxEntries: 24,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: /^https:\/\/(drive\.google\.com|lh3\.googleusercontent\.com)\/.*/i,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'sponsor-logos',
+                expiration: {
+                  maxEntries: 20,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+          ],
+        },
+        manifest: {
+          name: 'BrainRotChecker',
+          short_name: 'BrainRot',
+          description: 'Train your focus with a diagnosis + rehab arcade experience.',
+          theme_color: '#05060f',
+          background_color: '#05060f',
+          display: 'standalone',
+          orientation: 'portrait',
+          start_url: '/',
+          scope: '/',
+          icons: [
+            {
+              src: '/pwa-192.svg',
+              sizes: '192x192',
+              type: 'image/svg+xml',
+              purpose: 'any',
+            },
+            {
+              src: '/pwa-512.svg',
+              sizes: '512x512',
+              type: 'image/svg+xml',
+              purpose: 'any maskable',
+            },
+          ],
+        },
+        devOptions: {
+          enabled: true,
+        },
+      }),
+    ],
   }
 })

@@ -501,6 +501,14 @@ a { color: inherit; text-decoration: none; }
   align-items: center;
   gap: 10px;
 }
+.landing-brand-logo {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 0 18px rgba(57,255,20,0.2);
+  object-fit: cover;
+}
 .landing-brand-dot {
   width: 12px;
   height: 12px;
@@ -929,6 +937,81 @@ a { color: inherit; text-decoration: none; }
 .landing-contact-card span {
   color: var(--text-muted);
   font-size: 0.84rem;
+}
+.landing-install-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.landing-install-head h2 {
+  margin-bottom: 8px;
+}
+.landing-install-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+.landing-install-note {
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+.landing-install-ok {
+  border: 1px solid rgba(57,255,20,0.38);
+  border-radius: var(--r-pill);
+  background: rgba(57,255,20,0.11);
+  color: var(--green);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 7px 12px;
+}
+.landing-install-guide-toggle {
+  width: fit-content;
+  border: 1px solid rgba(168,85,247,0.35);
+  border-radius: var(--r-pill);
+  background: rgba(168,85,247,0.1);
+  color: #f0e8ff;
+  font-size: 0.78rem;
+  padding: 7px 12px;
+}
+.landing-install-guide-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.landing-install-guide-switch button {
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: var(--r-pill);
+  padding: 7px 12px;
+  color: rgba(240,240,245,0.8);
+  font-size: 0.78rem;
+  transition: border-color 0.18s, background 0.18s, color 0.18s;
+}
+.landing-install-guide-switch button:hover {
+  border-color: rgba(168,85,247,0.4);
+  color: #fff;
+}
+.landing-install-guide-switch button.is-active {
+  border-color: rgba(57,255,20,0.45);
+  background: rgba(57,255,20,0.1);
+  color: var(--green);
+}
+.landing-install-steps {
+  margin-left: 18px;
+  display: grid;
+  gap: 7px;
+  color: rgba(240,240,245,0.86);
+  font-size: 0.88rem;
+  line-height: 1.55;
+}
+.landing-install-toast {
+  border: 1px solid rgba(57,255,20,0.3);
+  border-radius: var(--r-md);
+  background: rgba(57,255,20,0.08);
+  color: var(--green);
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 10px 12px;
 }
 
 @media (max-width: 900px) {
