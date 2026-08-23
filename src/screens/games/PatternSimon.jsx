@@ -14,6 +14,14 @@ const BUTTONS = [
 const MAX_ROUNDS = 10
 const SHOW_DELAY = 700 // ms per step while showing
 
+function randomIndex(exclude = -1) {
+  let value = Math.floor(Math.random() * 4)
+  while (value === exclude) {
+    value = Math.floor(Math.random() * 4)
+  }
+  return value
+}
+
 export default function PatternSimon() {
   const [sequence, setSequence] = useState([])
   const [playerSeq, setPlayerSeq] = useState([])
@@ -26,6 +34,7 @@ export default function PatternSimon() {
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
+  const lastStartRef = useRef('')
 
   const clearTimers = () => {
     timersRef.current.forEach(clearTimeout)
@@ -49,18 +58,31 @@ export default function PatternSimon() {
   }, [play])
 
   const startRound = useCallback((currentSeq) => {
-    const next = [...currentSeq, Math.floor(Math.random() * 4)]
+    const last = currentSeq[currentSeq.length - 1]
+    const next = [...currentSeq, randomIndex(last)]
     setSequence(next)
     setRound(next.length - 2) // round 1 = length 3 → round display = 1
     setTimeout(() => showSequence(next), 600)
   }, [showSequence])
 
   const handleStart = () => {
-    const first = [
-      Math.floor(Math.random() * 4),
-      Math.floor(Math.random() * 4),
-      Math.floor(Math.random() * 4),
-    ]
+    let first = [randomIndex(), randomIndex(), randomIndex()]
+    for (let i = 1; i < first.length; i += 1) {
+      if (first[i] === first[i - 1]) first[i] = randomIndex(first[i - 1])
+    }
+
+    let signature = first.join('-')
+    let tries = 0
+    while (signature === lastStartRef.current && tries < 6) {
+      first = [randomIndex(), randomIndex(), randomIndex()]
+      for (let i = 1; i < first.length; i += 1) {
+        if (first[i] === first[i - 1]) first[i] = randomIndex(first[i - 1])
+      }
+      signature = first.join('-')
+      tries += 1
+    }
+
+    lastStartRef.current = signature
     setSequence(first)
     setRound(1)
     setTimeout(() => showSequence(first), 400)

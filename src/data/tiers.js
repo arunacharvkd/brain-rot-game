@@ -12,7 +12,7 @@ export const TIERS = [
     id: 1,
     label: 'MILDLY GLAZED',
     emoji: '🍩',
-    color: '#fbbf24',
+    logo: 'https://drive.google.com/uc?export=view&id=1rq-gjyNT_6yBiFdK0ZVAQ2Cn0tBCGvrB',
     pct: 35,
     desc: "You have some screen habits to work on — totally normal, and totally fixable. Brain Rehab will sharpen you right up! 🌱",
     rehab: 'A few rounds of Brain Rehab will sharpen you right up',
@@ -60,3 +60,29 @@ export const SPONSOR = {
   ctaUrl: 'https://yourbrand.com/?ref=brainrot',
   badgeText: 'Brain Rehab powered by',
 }
+
+export const SUPPORTING_SPONSORS = [
+  {
+    active: false,
+    name: 'FocusFlow',
+    tagline: 'Daily routines that actually stick',
+    url: 'https://example.com/focusflow',
+    logo: 'https://drive.google.com/thumbnail?id=1rq-gjyNT_6yBiFdK0ZVAQ2Cn0tBCGvrB&sz=w1200',
+    platform: 'instagram',
+    handle: '@focusflow',
+  },
+  {
+    active: false,
+    name: 'StudySprint',
+    tagline: 'Short study bursts with scoreboards',
+    url: 'https://example.com/studysprint',
+    logo: null,
+  },
+  {
+    active: false,
+    name: 'CalmLoop',
+    tagline: 'Breathing breaks for deep work sessions',
+    url: 'https://example.com/calmloop',
+    logo: null,
+  },
+]

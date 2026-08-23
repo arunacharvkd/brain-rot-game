@@ -6,34 +6,60 @@ import NeonButton from '../../components/NeonButton'
 import { useSound } from '../../hooks/useSound'
 
 const WORD_LIST = [
-  'FOCUS', 'BRAIN', 'LEARN', 'SLEEP', 'WATER',
-  'THINK', 'RELAX', 'CLEAR', 'QUIET', 'PEACE',
-  'BOOKS', 'SMART', 'FRESH', 'AWARE', 'STUDY',
+  'FOCUS', 'BRAIN', 'LEARN', 'SLEEP', 'WATER', 'THINK', 'RELAX', 'CLEAR', 'QUIET', 'PEACE',
+  'BOOKS', 'SMART', 'FRESH', 'AWARE', 'STUDY', 'MIND', 'CALM', 'POWER', 'LOGIC', 'NOTES',
+  'MUSIC', 'BREAK', 'CLARITY', 'ENERGY', 'VISION', 'MEMORY', 'ATTENTION', 'BALANCE', 'DISCIPLINE', 'HABIT',
+  'GROWTH', 'SUCCESS', 'PRACTICE', 'CONSISTENCY', 'CREATIVE', 'CURIOUS', 'STRATEGY', 'PROGRESS', 'INSIGHT', 'WELLNESS',
 ]
 const TOTAL = 10
 const Q_TIME = 5
 
-function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5) }
+function randInt(max) {
+  if (window.crypto?.getRandomValues) {
+    const array = new Uint32Array(1)
+    window.crypto.getRandomValues(array)
+    return array[0] % max
+  }
+  return Math.floor(Math.random() * max)
+}
+
+function shuffle(arr) {
+  const copy = [...arr]
+  for (let i = copy.length - 1; i > 0; i -= 1) {
+    const j = randInt(i + 1)
+    ;[copy[i], copy[j]] = [copy[j], copy[i]]
+  }
+  return copy
+}
 
 function scramble(word) {
-  let result
-  do {
-    result = word.split('').sort(() => Math.random() - 0.5).join('')
-  } while (result === word)
-  return result
+  if (word.length < 2) return word
+  let result = word
+  let tries = 0
+  while (result === word && tries < 8) {
+    result = shuffle(word.split('')).join('')
+    tries += 1
+  }
+  if (result !== word) return result
+
+  const chars = word.split('')
+  const swapAt = randInt(chars.length - 1)
+  ;[chars[swapAt], chars[swapAt + 1]] = [chars[swapAt + 1], chars[swapAt]]
+  return chars.join('')
 }
 
 function makeRound(wordList, usedWords) {
   const available = wordList.filter((w) => !usedWords.has(w))
-  const word = available[Math.floor(Math.random() * available.length)]
+  const pool = available.length > 0 ? available : wordList
+  const word = pool[randInt(pool.length)]
   const distractors = shuffle(wordList.filter((w) => w !== word)).slice(0, 3)
   return { word, scrambled: scramble(word), options: shuffle([word, ...distractors]) }
 }
 
 export default function WordScramble() {
   const [phase, setPhase] = useState('intro')
-  const [usedWords] = useState(() => new Set())
-  const [round, setRound] = useState(makeRound.bind(null, WORD_LIST, new Set()))
+  const usedWordsRef = useRef(new Set())
+  const [round, setRound] = useState(() => makeRound(WORD_LIST, usedWordsRef.current))
   const [qIndex, setQIndex] = useState(0)
   const [timeLeft, setTimeLeft] = useState(Q_TIME)
   const [score, setScore] = useState(0)
@@ -58,20 +84,20 @@ export default function WordScramble() {
         setArcadeScore('word', newScore)
         navTimerRef.current = setTimeout(() => setScreen('arcade'), 2400)
       } else {
-        usedWords.add(round.word)
-        setRound(makeRound(WORD_LIST, usedWords))
+        usedWordsRef.current.add(round.word)
+        setRound(makeRound(WORD_LIST, usedWordsRef.current))
         setQIndex((i) => i + 1)
         setTimeLeft(Q_TIME)
         setFeedback(null)
         setLocked(false)
       }
     }, 550)
-  }, [locked, score, qIndex, round, usedWords, play, setArcadeScore, setScreen])
+  }, [locked, score, qIndex, round, play, setArcadeScore, setScreen])
 
   const handlePlayAgain = () => {
     clearTimeout(navTimerRef.current)
-    usedWords.clear()
-    setRound(makeRound(WORD_LIST, new Set()))
+    usedWordsRef.current.clear()
+    setRound(makeRound(WORD_LIST, usedWordsRef.current))
     setQIndex(0)
     setTimeLeft(Q_TIME)
     setScore(0)

@@ -11,6 +11,8 @@ const GAMES = [
   { id: 'breath', emoji: '💨', name: 'Breath Focus',    desc: 'Follow the breathing circle. Stay in sync.',         screen: 'game-breath' },
   { id: 'word',   emoji: '🔤', name: 'Word Scramble',   desc: 'Unscramble the word before time runs out.',          screen: 'game-word' },
   { id: 'colour', emoji: '🎨', name: 'Colour vs Word',  desc: 'Click the ink colour — ignore what the word says.',  screen: 'game-colour' },
+  { id: 'odd',    emoji: '🕵️', name: 'Odd One Out',    desc: 'Spot the different emoji before time runs out.',      screen: 'game-odd' },
+  { id: 'order',  emoji: '🔢', name: 'Tap Order',       desc: 'Tap numbers in ascending order under pressure.',      screen: 'game-order' },
 ]
 
 export default function ArcadeHub() {

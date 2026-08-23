@@ -14,6 +14,8 @@ import SpeedMath from './screens/games/SpeedMath'
 import BreathFocus from './screens/games/BreathFocus'
 import WordScramble from './screens/games/WordScramble'
 import ColourWord from './screens/games/ColourWord'
+import OddOneOut from './screens/games/OddOneOut'
+import TapOrder from './screens/games/TapOrder'
 import Footer from './components/Footer'
 
 const SCREENS = {
@@ -29,6 +31,8 @@ const SCREENS = {
   'game-breath':  BreathFocus,
   'game-word':    WordScramble,
   'game-colour':  ColourWord,
+  'game-odd':     OddOneOut,
+  'game-order':   TapOrder,
   results:        FinalResults,
   privacy:        PrivacyPolicy,
 }

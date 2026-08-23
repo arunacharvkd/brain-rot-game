@@ -1,6 +1,28 @@
 import { motion } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
+import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
+
+function getSponsorMeta(item) {
+  const url = (item.url || '').toLowerCase()
+  const platform = item.platform || (url.includes('instagram.com') ? 'instagram' : 'web')
+  const handle = item.handle || deriveHandle(item.url)
+  const cta = platform === 'instagram' ? 'Visit on Instagram' : 'Visit Sponsor'
+  const platformLabel = platform === 'instagram' ? 'Instagram' : 'Partner'
+  return { platform, handle, cta, platformLabel }
+}
+
+function deriveHandle(url) {
+  if (!url) return ''
+  try {
+    const pathname = new URL(url).pathname
+    const segment = pathname.split('/').filter(Boolean)[0]
+    if (!segment) return ''
+    return `@${segment}`
+  } catch {
+    return ''
+  }
+}
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 20 },
@@ -14,6 +36,7 @@ export default function Landing() {
   const diagnosisDone = useGameStore((s) => s.diagnosisTier > 0 || s.quizScore > 0)
   const gameDone = useGameStore((s) => Object.keys(s.arcadeScores).length > 0)
   const reset = useGameStore((s) => s.reset)
+  const activeSupportingSponsors = SUPPORTING_SPONSORS.filter((item) => item.active)
 
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -41,6 +64,7 @@ export default function Landing() {
             <div className="landing-links">
               <button onClick={() => scrollTo('home')}>Home</button>
               <button onClick={() => scrollTo('about')}>About</button>
+              {(SPONSOR.active || activeSupportingSponsors.length > 0) && <button onClick={() => scrollTo('sponsor')}>Sponsor</button>}
               <button onClick={() => scrollTo('contact')}>Contact</button>
             </div>
             <button className="landing-topbar-cta" onClick={() => setScreen('quiz')}>
@@ -62,7 +86,7 @@ export default function Landing() {
 
                 <div className="landing-chip-row">
                   <span>3 minute onboarding</span>
-                  <span>7 cognitive mini games</span>
+                  <span>9 cognitive mini games</span>
                   <span>No account needed</span>
                 </div>
 
@@ -108,7 +132,7 @@ export default function Landing() {
                 />
                 <div className="landing-metric-panel">
                   <div>
-                    <strong>7</strong>
+                    <strong>9</strong>
                     <span>mini games</span>
                   </div>
                   <div>
@@ -123,6 +147,14 @@ export default function Landing() {
               </div>
             </div>
             <p className="landing-footer">For entertainment and habit reflection, not medical diagnosis.</p>
+            {SPONSOR.active && (
+              <div className="landing-sponsor-inline">
+                <span>{SPONSOR.badgeText}</span>
+                <a href={SPONSOR.ctaUrl} target="_blank" rel="noopener noreferrer">
+                  {SPONSOR.name}
+                </a>
+              </div>
+            )}
           </div>
         </section>
 
@@ -150,6 +182,73 @@ export default function Landing() {
             </div>
           </div>
         </section>
+
+        {(SPONSOR.active || activeSupportingSponsors.length > 0) && (
+          <section id="sponsor" className="landing-section">
+            <div className="landing-block landing-sponsor-block">
+              {SPONSOR.active && (
+                <div className="landing-sponsor-grid">
+                  <div>
+                    <p className="landing-sponsor-eyebrow">Official Sponsor</p>
+                    <h2>Built In Partnership With {SPONSOR.name}</h2>
+                    <p className="landing-block-intro">{SPONSOR.tagline}</p>
+                    <a
+                      className="landing-sponsor-cta"
+                      href={SPONSOR.ctaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {SPONSOR.ctaText}
+                    </a>
+                  </div>
+
+                  <div className="landing-sponsor-logo-wrap">
+                    {SPONSOR.logo ? (
+                      <img src={SPONSOR.logo} alt={`${SPONSOR.name} logo`} className="landing-sponsor-logo" />
+                    ) : (
+                      <div className="landing-sponsor-logo-fallback">{SPONSOR.name}</div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {activeSupportingSponsors.length > 0 && (
+                <div className="landing-supporting-wrap">
+                  <p className="landing-sponsor-eyebrow">Supporting Sponsors</p>
+                  <div className="landing-supporting-grid">
+                    {activeSupportingSponsors.map((item) => {
+                      const meta = getSponsorMeta(item)
+                      return (
+                        <a
+                          key={item.name}
+                          href={item.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="landing-supporting-card"
+                        >
+                          {item.logo ? (
+                            <img src={item.logo} alt={`${item.name} logo`} className="landing-supporting-logo" />
+                          ) : (
+                            <div className="landing-supporting-logo-fallback">{item.name}</div>
+                          )}
+                          <div className="landing-supporting-card-meta">
+                            <span className="landing-supporting-badge">{meta.platformLabel}</span>
+                            {meta.handle && (
+                              <span className="landing-supporting-handle">{meta.handle}</span>
+                            )}
+                          </div>
+                          <strong>{item.name}</strong>
+                          <span>{item.tagline}</span>
+                          <em>{meta.cta}</em>
+                        </a>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Feedback section temporarily disabled */}
 

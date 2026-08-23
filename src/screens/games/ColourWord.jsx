@@ -12,7 +12,7 @@ const COLOURS = [
   { name: 'YELLOW', value: '#eab308' },
 ]
 const TOTAL = 15
-const Q_TIME = 3
+const Q_TIME = 4
 
 function shuffle(arr) { return [...arr].sort(() => Math.random() - 0.5) }
 
@@ -21,7 +21,7 @@ function makeRound() {
   let inkColour
   do { inkColour = COLOURS[Math.floor(Math.random() * COLOURS.length)] }
   while (inkColour === wordColour)
-  return { wordText: wordColour.name, inkColour }
+  return { wordText: wordColour.name, inkColour, options: shuffle([...COLOURS]) }
 }
 
 export default function ColourWord() {
@@ -58,7 +58,7 @@ export default function ColourWord() {
         setFeedback(null)
         setLocked(false)
       }
-    }, 480)
+    }, 620)
   }, [locked, score, qIndex, round, play, setArcadeScore, setScreen])
 
   const handlePlayAgain = () => {
@@ -94,7 +94,6 @@ export default function ColourWord() {
   }, [timeLeft, phase, locked])
 
   const timerPct = (timeLeft / Q_TIME) * 100
-  const chipOptions = shuffle([...COLOURS])
 
   return (
     <motion.div
@@ -190,7 +189,7 @@ export default function ColourWord() {
 
                 {/* Colour chips */}
                 <div className="colour-options">
-                  {chipOptions.map((c) => {
+                  {round.options.map((c) => {
                     const isCorrect = c.name === round.inkColour.name
                     const isChosen = feedback === c.name
                     return (
