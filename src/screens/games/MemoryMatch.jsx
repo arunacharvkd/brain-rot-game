@@ -4,6 +4,7 @@ import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
 import { useSound } from '../../hooks/useSound'
+import { t } from '../../i18n/translations'
 
 const EMOJIS = ['🧠', '📚', '💧', '🍎', '😴', '🌟', '⚡', '🎯']
 const TIME = 90
@@ -30,6 +31,7 @@ export default function MemoryMatch() {
   const [locked, setLocked] = useState(false)
   const [score, setScore] = useState(0)
   const { play } = useSound()
+  const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
@@ -113,13 +115,12 @@ export default function MemoryMatch() {
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🃏</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>Memory Match</h2>
+            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'memoryIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
-              Flip cards to find matching emoji pairs. Match all 8 pairs to win!
-              You have <strong style={{ color: '#fff' }}>90 seconds</strong>.
+              {t(language, 'memoryIntroText').replace('{seconds}', TIME)}
             </p>
             <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
-              Start →
+              {t(language, 'startButton')}
             </NeonButton>
           </div>
         ) : (

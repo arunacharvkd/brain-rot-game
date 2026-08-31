@@ -8,6 +8,7 @@ import NeonButton from '../components/NeonButton'
 import { TIERS, calcFinalTier, SPONSOR } from '../data/tiers'
 import { useSound } from '../hooks/useSound'
 import { trackEvent } from '../lib/analytics'
+import { t } from '../i18n/translations'
 
 function getVerdict(before, after) {
   if (after < before) {
@@ -45,6 +46,7 @@ export default function FinalResults() {
   const setScreen = useGameStore((s) => s.setScreen)
   const finalTier = useGameStore((s) => s.finalTier)
   const reset = useGameStore((s) => s.reset)
+  const language = useGameStore((s) => s.language)
   const { play } = useSound()
   const [copied, setCopied] = useState(false)
 
@@ -108,7 +110,7 @@ export default function FinalResults() {
               cursor: 'pointer',
             }}
           >
-            ← Back to Arcade
+            {t(language, 'backToArcade')}
           </button>
         </div>
 
@@ -118,7 +120,7 @@ export default function FinalResults() {
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 240, damping: 16 }}
         >
-          REHAB COMPLETE 🎉
+          {t(language, 'rehabComplete')}
         </motion.h1>
 
         <motion.p className="results-verdict" {...fadeUp(0.18)}>
@@ -128,7 +130,7 @@ export default function FinalResults() {
         {/* Before / After meters */}
         <motion.div className="results-meters" {...fadeUp(0.28)}>
           <div className="results-meter-col">
-            <BrainRotMeter tier={diagnosisTier} label="Before" />
+            <BrainRotMeter tier={diagnosisTier} label={t(language, 'before')} />
             <div style={{ textAlign: 'center', marginTop: 8 }}>
               <span className={`tier-chip tier-${diagnosisTier}`}>
                 {TIERS[diagnosisTier].emoji} {TIERS[diagnosisTier].label}
@@ -137,7 +139,7 @@ export default function FinalResults() {
           </div>
           <div className="results-arrow">→</div>
           <div className="results-meter-col">
-            <BrainRotMeter tier={finalTier} label="After Rehab" />
+            <BrainRotMeter tier={finalTier} label={t(language, 'afterRehab')} />
             <div style={{ textAlign: 'center', marginTop: 8 }}>
               <span className={`tier-chip tier-${finalTier}`}>
                 {TIERS[finalTier].emoji} {TIERS[finalTier].label}
@@ -147,9 +149,9 @@ export default function FinalResults() {
         </motion.div>
 
         <motion.p className="results-score text-mono" {...fadeUp(0.36)}>
-          Total Score:{' '}
+          {t(language, 'totalScore')}{' '}
           <span style={{ color: 'var(--green)', fontWeight: 700 }}>{totalScore} pts</span>
-          <span style={{ color: 'var(--text-muted)', marginLeft: 12 }}>across {gamesPlayed} game{gamesPlayed !== 1 ? 's' : ''}</span>
+          <span style={{ color: 'var(--text-muted)', marginLeft: 12 }}>{t(language, 'across')} {gamesPlayed} {gamesPlayed === 1 ? t(language, 'game') : t(language, 'games')}</span>
         </motion.p>
 
         <motion.div
@@ -157,10 +159,10 @@ export default function FinalResults() {
           style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}
         >
           <NeonButton onClick={handleShare} variant="purple">
-            {copied ? '✓ Copied!' : 'Share Result 📋'}
+            {copied ? t(language, 'copied') : t(language, 'share')}
           </NeonButton>
           <NeonButton onClick={reset} variant="outline">
-            Play Again
+            {t(language, 'playAgain')}
           </NeonButton>
         </motion.div>
 
@@ -214,7 +216,7 @@ export default function FinalResults() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
-            ✓ Copied to clipboard
+            {t(language, 'copiedClipboard')}
           </motion.div>
         )}
       </AnimatePresence>

@@ -4,6 +4,7 @@ import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
 import { useSound } from '../../hooks/useSound'
+import { t } from '../../i18n/translations'
 
 const BUTTONS = [
   { color: '#ef4444', label: '🔴' },
@@ -31,6 +32,7 @@ export default function PatternSimon() {
   const [score, setScore] = useState(0)
   const timersRef = useRef([])
   const { play } = useSound()
+  const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
@@ -158,21 +160,20 @@ export default function PatternSimon() {
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🟥</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>Pattern Simon</h2>
+            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'simonIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
-              Watch the colour sequence light up, then repeat it in order.
-              The sequence grows longer each round. How far can you go?
+              {t(language, 'simonIntroText')}
             </p>
             <NeonButton onClick={handleStart} variant="purple" style={{ width: '100%' }}>
-              Start →
+              {t(language, 'startButton')}
             </NeonButton>
           </div>
         ) : (
           <>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 20 }}>
-              <span className="text-mono text-sm text-muted">Round {displayRound}</span>
+              <span className="text-mono text-sm text-muted">{t(language, 'roundLabel').replace('{count}', displayRound)}</span>
               <span className="text-mono text-sm" style={{ color: 'var(--green)' }}>
-                {score} pts
+                {t(language, 'scoreLabel').replace('{score}', score)}
               </span>
               <button
                 onClick={() => setScreen('arcade')}
@@ -207,15 +208,15 @@ export default function PatternSimon() {
 
             <div style={{ textAlign: 'center', marginTop: 18, minHeight: 24 }}>
               {phase === 'showing' && (
-                <span className="text-muted text-sm">Watch the sequence...</span>
+                <span className="text-muted text-sm">{t(language, 'simonWatch')}</span>
               )}
               {phase === 'inputting' && (
                 <span style={{ color: 'var(--purple)', fontSize: '0.9rem', fontWeight: 600 }}>
-                  Your turn — {sequence.length - playerSeq.length} left
+                  {t(language, 'simonYourTurn').replace('{left}', sequence.length - playerSeq.length)}
                 </span>
               )}
               {phase === 'win_round' && (
-                <span style={{ color: 'var(--green)', fontWeight: 700 }}>✓ Correct! Next round...</span>
+                <span style={{ color: 'var(--green)', fontWeight: 700 }}>{t(language, 'simonCorrect')}</span>
               )}
               {(phase === 'wrong' || phase === 'done') && (
                 <AnimatePresence>
@@ -227,9 +228,9 @@ export default function PatternSimon() {
                   >
                     <div style={{ fontSize: '2rem' }}>{phase === 'done' ? '🏆' : '💡'}</div>
                     <div style={{ fontSize: '1.3rem', fontWeight: 800, color: phase === 'done' ? 'var(--green)' : 'var(--yellow)' }}>
-                      {phase === 'done' ? 'Sequence Master!' : `Reached Round ${displayRound}`}
+                      {phase === 'done' ? t(language, 'simonSequenceMaster') : t(language, 'simonReached').replace('{count}', displayRound)}
                     </div>
-                    <div className="text-mono text-muted text-sm">Score: {score} pts</div>
+                    <div className="text-mono text-muted text-sm">{t(language, 'memoryIntroScore').replace('{score}', score)}</div>
                     <button
                       onClick={handlePlayAgain}
                       style={{

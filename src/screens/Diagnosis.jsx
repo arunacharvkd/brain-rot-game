@@ -6,6 +6,7 @@ import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
 import { TIERS, scoreToTier, SPONSOR } from '../data/tiers'
 import { trackEvent } from '../lib/analytics'
+import { t } from '../i18n/translations'
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 18 },
@@ -19,6 +20,7 @@ export default function Diagnosis() {
   const diagnosisTier = useGameStore((s) => s.diagnosisTier)
   const setDiagnosisTier = useGameStore((s) => s.setDiagnosisTier)
   const setScreen = useGameStore((s) => s.setScreen)
+  const language = useGameStore((s) => s.language)
 
   const totalScore = quizScore + reactionScore
 
@@ -58,7 +60,7 @@ export default function Diagnosis() {
               cursor: 'pointer',
             }}
           >
-            ← Back
+            ← {t(language, 'back')}
           </button>
         </div>
 
@@ -83,9 +85,9 @@ export default function Diagnosis() {
         </motion.p>
 
         <motion.div {...fadeUp(0.4)}>
-          <BrainRotMeter tier={diagnosisTier} label="Brain Rot Level" />
+          <BrainRotMeter tier={diagnosisTier} label={t(language, 'brainRotLevel')} />
           <p className="diag-score-row">
-            Quiz {quizScore}/21 &nbsp;·&nbsp; Reaction +{reactionScore} &nbsp;·&nbsp; Total {totalScore}/30
+            {t(language, 'quizScore')} {quizScore}/21 &nbsp;·&nbsp; {t(language, 'reaction')} +{reactionScore} &nbsp;·&nbsp; {t(language, 'total')} {totalScore}/30
           </p>
         </motion.div>
 
@@ -95,7 +97,7 @@ export default function Diagnosis() {
             variant={diagnosisTier >= 2 ? 'purple' : 'green'}
             style={{ width: '100%' }}
           >
-            Start Brain Rehab →
+            {t(language, 'startRehab')}
           </NeonButton>
           {SPONSOR.active && (
             <p style={{ marginTop: 14, fontSize: '0.72rem', color: 'var(--text-muted)', textAlign: 'center' }}>

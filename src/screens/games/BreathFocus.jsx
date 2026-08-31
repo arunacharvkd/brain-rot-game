@@ -4,6 +4,7 @@ import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
 import { useSound } from '../../hooks/useSound'
+import { t } from '../../i18n/translations'
 
 // 8 cycles: inhale 4s → exhale 4s, "tap" prompt fires at each phase transition
 const TOTAL_PHASES = 8
@@ -22,6 +23,7 @@ export default function BreathFocus() {
   const rafRef = useRef(null)
   const phaseStartRef = useRef(null)
   const { play } = useSound()
+  const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
@@ -101,25 +103,23 @@ export default function BreathFocus() {
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>💨</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>Breath Focus</h2>
+            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'breathIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
-              Follow the breathing circle. When <strong style={{ color: 'var(--purple)' }}>TAP</strong> appears,
-              tap it in sync. The closer you are to the moment, the more points you earn.
-              4 breath cycles · ~32 seconds.
+              {t(language, 'breathIntroText')}
             </p>
             <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
-              Begin →
+              {t(language, 'breathIntroBegin')}
             </NeonButton>
           </div>
         ) : phase === 'done' ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🌿</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 8 }}>Excellent!</h2>
+            <h2 style={{ fontWeight: 800, marginBottom: 8 }}>{t(language, 'breathDone')}</h2>
             <p className="text-mono" style={{ fontSize: '1.5rem', color: 'var(--green)', fontWeight: 700 }}>
-              {score} pts
+              {t(language, 'scoreLabel').replace('{score}', score)}
             </p>
             <p className="text-muted text-sm" style={{ marginTop: 8 }}>
-              You completed {completedCycles} breath cycles 🧘
+              {t(language, 'breathCompleted').replace('{count}', completedCycles)}
             </p>
             <button
               onClick={() => {
@@ -148,7 +148,7 @@ export default function BreathFocus() {
             {/* Cycle counter */}
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, marginBottom: 8 }}>
               <span className="text-mono text-muted text-xs">
-                Cycle {completedCycles + 1} / {TOTAL_PHASES / 2}  ·  {score} pts
+                {t(language, 'breathCycle').replace('{count}', completedCycles + 1).replace('{total}', TOTAL_PHASES / 2)} · {t(language, 'scoreLabel').replace('{score}', score)}
               </span>
               <button
                 onClick={() => setScreen('arcade')}
@@ -185,7 +185,7 @@ export default function BreathFocus() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    {tapped ? '✓ Synced!' : 'TAP →'}
+                    {tapped ? t(language, 'breathSynced') : t(language, 'breathTap')}
                   </motion.div>
                 ) : (
                   <motion.div
@@ -195,7 +195,7 @@ export default function BreathFocus() {
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                   >
-                    {cyclePhase === 'inhale' ? 'Inhale...' : 'Exhale...'}
+                    {cyclePhase === 'inhale' ? t(language, 'breathInhale') : t(language, 'breathExhale')}
                   </motion.div>
                 )}
               </AnimatePresence>

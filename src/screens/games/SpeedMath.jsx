@@ -35,6 +35,7 @@ export default function SpeedMath() {
   const [feedback, setFeedback] = useState(null) // null | 'correct' | 'wrong'
   const [locked, setLocked] = useState(false)
   const { play } = useSound()
+  const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
@@ -107,17 +108,16 @@ export default function SpeedMath() {
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>⚡</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>Speed Math</h2>
+            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'speedIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
-              20 quick arithmetic questions — {Q_TIME} seconds each.
-              Tap the correct answer before time runs out!
+              {t(language, 'speedIntroText').replace('{count}', TOTAL).replace('{seconds}', Q_TIME)}
             </p>
             <NeonButton
               onClick={() => { setPhase('playing'); setTimeLeft(Q_TIME) }}
               variant="purple"
               style={{ width: '100%' }}
             >
-              Start →
+              {t(language, 'startButton')}
             </NeonButton>
           </div>
         ) : phase === 'done' ? (

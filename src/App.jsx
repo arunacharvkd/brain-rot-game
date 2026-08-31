@@ -19,6 +19,7 @@ import OddOneOut from './screens/games/OddOneOut'
 import TapOrder from './screens/games/TapOrder'
 import Footer from './components/Footer'
 import { trackEvent, trackScreenView } from './lib/analytics'
+import { LANGUAGES } from './i18n/translations'
 
 const SCREENS = {
   landing:        Landing,
@@ -47,6 +48,8 @@ export default function App() {
   const diagnosisTier = useGameStore((s) => s.diagnosisTier)
   const arcadeScores = useGameStore((s) => s.arcadeScores)
   const toggleMute = useGameStore((s) => s.toggleMute)
+  const language = useGameStore((s) => s.language)
+  const setLanguage = useGameStore((s) => s.setLanguage)
   const Screen = SCREENS[screen] ?? Landing
   const isGameScreen = screen === 'game' || screen.startsWith('game-')
   const hasTrackedSessionRef = useRef(false)
@@ -69,6 +72,10 @@ export default function App() {
     trackScreenView(screen)
   }, [screen])
 
+  useEffect(() => {
+    document.documentElement.lang = language
+  }, [language])
+
   return (
     <div className="app">
       {!isGameScreen && (
@@ -77,20 +84,21 @@ export default function App() {
           <div className="bg-orb bg-orb-2" />
         </>
       )}
-      <button
-        onClick={toggleMute}
-        title={muted ? 'Unmute' : 'Mute'}
-        style={{
-          position: 'fixed', top: 14, right: 16, zIndex: 1000,
-          background: 'rgba(255,255,255,0.06)',
-          border: '1px solid rgba(255,255,255,0.12)',
-          borderRadius: 8, color: muted ? 'var(--text-muted)' : '#fff',
-          fontSize: '1.1rem', padding: '5px 10px', cursor: 'pointer',
-          backdropFilter: 'blur(4px)',
-        }}
-      >
-        {muted ? '🔇' : '🔊'}
-      </button>
+      <div className="app-controls">
+        <label className="language-picker">
+          <span className="sr-only">Language</span>
+          <select value={language} onChange={(event) => setLanguage(event.target.value)}>
+            {LANGUAGES.map(({ code, label }) => <option key={code} value={code}>{label}</option>)}
+          </select>
+        </label>
+        <button
+          onClick={toggleMute}
+          title={muted ? 'Unmute' : 'Mute'}
+          className="sound-toggle"
+        >
+          {muted ? '🔇' : '🔊'}
+        </button>
+      </div>
       <AnimatePresence mode="wait">
         <Screen key={screen} />
       </AnimatePresence>

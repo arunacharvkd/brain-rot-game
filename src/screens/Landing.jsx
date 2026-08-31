@@ -4,6 +4,7 @@ import NeonButton from '../components/NeonButton'
 import PwaInstallCard from '../components/PwaInstallCard'
 import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
 import { trackEvent } from '../lib/analytics'
+import { t } from '../i18n/translations'
 
 function getSponsorMeta(item) {
   const url = (item.url || '').toLowerCase()
@@ -38,6 +39,7 @@ export default function Landing() {
   const diagnosisDone = useGameStore((s) => s.diagnosisTier > 0 || s.quizScore > 0)
   const gameDone = useGameStore((s) => Object.keys(s.arcadeScores).length > 0)
   const reset = useGameStore((s) => s.reset)
+  const language = useGameStore((s) => s.language)
   const activeSupportingSponsors = SUPPORTING_SPONSORS.filter((item) => item.active)
 
   const scrollTo = (id) => {
@@ -64,17 +66,17 @@ export default function Landing() {
           </div>
           <div className="landing-nav-actions">
             <div className="landing-links">
-              <button onClick={() => scrollTo('home')}>Home</button>
-              <button onClick={() => scrollTo('install')}>Install App</button>
-              <button onClick={() => scrollTo('about')}>About</button>
+              <button onClick={() => scrollTo('home')}>{t(language, 'home')}</button>
+              <button onClick={() => scrollTo('install')}>{t(language, 'installApp')}</button>
+              <button onClick={() => scrollTo('about')}>{t(language, 'about')}</button>
               {(SPONSOR.active || activeSupportingSponsors.length > 0) && <button onClick={() => scrollTo('sponsor')}>Sponsor</button>}
-              <button onClick={() => scrollTo('contact')}>Contact</button>
+              <button onClick={() => scrollTo('contact')}>{t(language, 'contact')}</button>
             </div>
             <button className="landing-topbar-cta" onClick={() => {
               trackEvent('landing_cta_clicked', { cta: 'start_test_topbar' })
               setScreen('quiz')
             }}>
-              Start Test
+              {t(language, 'startTest')}
             </button>
           </div>
         </motion.div>
@@ -83,17 +85,16 @@ export default function Landing() {
           <div className="landing-hero">
             <div className="landing-hero-grid">
               <div className="landing-hero-content">
-                <p className="landing-eyebrow">Built for short-attention generation</p>
-                <h1 className="landing-title">Train your focus before your feed trains you.</h1>
+                <p className="landing-eyebrow">{t(language, 'builtFor')}</p>
+                <h1 className="landing-title">{t(language, 'heroTitle')}</h1>
                 <p className="landing-subtitle">
-                  BrainRotChecker combines one quick diagnosis with arcade-style rehab games,
-                  turning digital fatigue into a measurable recovery score.
+                  {t(language, 'heroSubtitle')}
                 </p>
 
                 <div className="landing-chip-row">
-                  <span>3 minute onboarding</span>
-                  <span>9 cognitive mini games</span>
-                  <span>No account needed</span>
+                  <span>{t(language, 'onboarding')}</span>
+                  <span>{t(language, 'gamesCount')}</span>
+                  <span>{t(language, 'noAccount')}</span>
                 </div>
 
                 <div className="landing-cta-row">
@@ -101,7 +102,7 @@ export default function Landing() {
                     trackEvent('landing_cta_clicked', { cta: 'start_diagnosis' })
                     setScreen('quiz')
                   }} variant="green">
-                    {diagnosisDone ? 'Retake Diagnosis' : 'Start Diagnosis'}
+                    {diagnosisDone ? t(language, 'retakeDiagnosis') : t(language, 'startDiagnosis')}
                   </NeonButton>
 
                   {diagnosisDone && (
@@ -109,21 +110,21 @@ export default function Landing() {
                       trackEvent('landing_cta_clicked', { cta: 'jump_into_rehab' })
                       setScreen('arcade')
                     }} variant="purple">
-                      Jump Into Rehab
+                      {t(language, 'jumpIntoRehab')}
                     </NeonButton>
                   )}
                 </div>
 
                 <div className="landing-subcta-row">
                   {diagnosisDone && !gameDone && (
-                    <button onClick={() => setScreen('diagnosis')}>View your last diagnosis</button>
+                    <button onClick={() => setScreen('diagnosis')}>{t(language, 'viewDiagnosis')}</button>
                   )}
 
                   {gameDone && (
                     <button onClick={() => {
                       trackEvent('landing_cta_clicked', { cta: 'see_latest_results' })
                       setScreen('results')
-                    }}>See your latest results</button>
+                    }}>{t(language, 'seeLatestResults')}</button>
                   )}
 
                   {hasPriorScore && (
@@ -131,7 +132,7 @@ export default function Landing() {
                       trackEvent('progress_reset_clicked')
                       reset()
                     }}>
-                      Reset progress
+                      {t(language, 'resetProgress')}
                     </button>
                   )}
                 </div>
@@ -151,20 +152,20 @@ export default function Landing() {
                 <div className="landing-metric-panel">
                   <div>
                     <strong>9</strong>
-                    <span>mini games</span>
+                    <span>{t(language, 'miniGames')}</span>
                   </div>
                   <div>
                     <strong>30+</strong>
-                    <span>challenge rounds</span>
+                    <span>{t(language, 'challengeRounds')}</span>
                   </div>
                   <div>
                     <strong>1</strong>
-                    <span>personal focus score</span>
+                    <span>{t(language, 'personalFocusScore')}</span>
                   </div>
                 </div>
               </div>
             </div>
-            <p className="landing-footer">For entertainment and habit reflection, not medical diagnosis.</p>
+            <p className="landing-footer">{t(language, 'footerNote')}</p>
             {SPONSOR.active && (
               <div className="landing-sponsor-inline">
                 <span>{SPONSOR.badgeText}</span>
@@ -184,24 +185,22 @@ export default function Landing() {
 
         <section id="about" className="landing-section">
           <div className="landing-block">
-            <h2>About The Product BrainRotChecker</h2>
+            <h2>{t(language, 'productHeading')}</h2>
             <p className="landing-block-intro">
-              BrainRotChecker is a playful productivity mirror. It combines a short behavior quiz,
-              reaction-time challenge, and a focus arcade to help users notice digital fatigue and
-              rebuild attention in a fun way.
+              {t(language, 'productBody')}
             </p>
             <div className="landing-feature-grid">
               <div className="landing-feature-item">
-                <h3>01 Diagnose Habits</h3>
-                <p>Get a clear focus snapshot based on scrolling patterns and reaction speed.</p>
+                <h3>01 {t(language, 'diagnoseHabits')}</h3>
+                <p>{t(language, 'diagnoseHabitsText')}</p>
               </div>
               <div className="landing-feature-item">
-                <h3>02 Rehab Through Play</h3>
-                <p>Use short game loops to practice timing, inhibition, and attention control.</p>
+                <h3>02 {t(language, 'rehabThroughPlay')}</h3>
+                <p>{t(language, 'rehabThroughPlayText')}</p>
               </div>
               <div className="landing-feature-item">
-                <h3>03 Track Progress</h3>
-                <p>Compare your before/after tier and return anytime to build momentum.</p>
+                <h3>03 {t(language, 'trackProgress')}</h3>
+                <p>{t(language, 'trackProgressText')}</p>
               </div>
             </div>
           </div>
@@ -278,16 +277,16 @@ export default function Landing() {
 
         <section id="contact" className="landing-section">
           <div className="landing-block landing-block-contact">
-            <h2>Contact Us</h2>
-            <p className="landing-block-intro">Want partnerships, sponsorships, or product feedback rounds? Reach out.</p>
+            <h2>{t(language, 'contactUs')}</h2>
+            <p className="landing-block-intro">{t(language, 'contactIntro')}</p>
             <div className="landing-contact-grid">
               <a href="mailto:vkdarunacharya@gmail.com" className="landing-contact-card">
-                <strong>General Contact</strong>
+                <strong>{t(language, 'generalContact')}</strong>
                 <span>vkdarunacharya@gmail.com</span>
               </a>
               <button className="landing-contact-card" onClick={() => setScreen('privacy')}>
-                <strong>Privacy Policy</strong>
-                <span>Read how scoring and data are handled</span>
+                <strong>{t(language, 'privacyPolicy')}</strong>
+                <span>{t(language, 'privacyPolicyDesc')}</span>
               </button>
             </div>
           </div>

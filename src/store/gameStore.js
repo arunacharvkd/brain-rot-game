@@ -12,6 +12,7 @@ const useGameStore = create(
       arcadeScores: {}, // { gameId: score }
       finalTier: 0,
       muted: false,
+      language: 'en',
 
       setScreen: (screen) =>
         set((s) => {
@@ -36,6 +37,7 @@ const useGameStore = create(
         }),
       setFinalTier: (finalTier) => set({ finalTier }),
       toggleMute: () => set((s) => ({ muted: !s.muted })),
+      setLanguage: (language) => set({ language }),
 
       reset: () =>
         set({
@@ -57,6 +59,7 @@ const useGameStore = create(
         arcadeScores: s.arcadeScores,
         finalTier: s.finalTier,
         muted: s.muted,
+        language: s.language,
       }),
     }
   )

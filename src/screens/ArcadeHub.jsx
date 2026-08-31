@@ -2,24 +2,25 @@ import { motion } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import NeonButton from '../components/NeonButton'
-
-const GAMES = [
-  { id: 'focus',  emoji: '🎯', name: 'Focus Game',      desc: 'Click good items, dodge bad ones. 3 rounds.',        screen: 'game' },
-  { id: 'memory', emoji: '🃏', name: 'Memory Match',    desc: 'Find all pairs before the timer runs out.',          screen: 'game-memory' },
-  { id: 'simon',  emoji: '🟥', name: 'Pattern Simon',   desc: 'Watch the sequence, then repeat it.',                screen: 'game-simon' },
-  { id: 'math',   emoji: '⚡', name: 'Speed Math',      desc: 'Rapid-fire mental arithmetic. 20 questions.',        screen: 'game-math' },
-  { id: 'breath', emoji: '💨', name: 'Breath Focus',    desc: 'Follow the breathing circle. Stay in sync.',         screen: 'game-breath' },
-  { id: 'word',   emoji: '🔤', name: 'Word Scramble',   desc: 'Unscramble the word before time runs out.',          screen: 'game-word' },
-  { id: 'colour', emoji: '🎨', name: 'Colour vs Word',  desc: 'Click the ink colour — ignore what the word says.',  screen: 'game-colour' },
-  { id: 'odd',    emoji: '🕵️', name: 'Odd One Out',    desc: 'Spot the different emoji before time runs out.',      screen: 'game-odd' },
-  { id: 'order',  emoji: '🔢', name: 'Tap Order',       desc: 'Tap numbers in ascending order under pressure.',      screen: 'game-order' },
-]
+import { t } from '../i18n/translations'
 
 export default function ArcadeHub() {
   const setScreen = useGameStore((s) => s.setScreen)
   const arcadeScores = useGameStore((s) => s.arcadeScores)
+  const language = useGameStore((s) => s.language)
   const gamesPlayed = Object.keys(arcadeScores).length
   const totalScore = Object.values(arcadeScores).reduce((a, b) => a + b, 0)
+  const GAMES = [
+    { id: 'focus',  emoji: '🎯', name: t(language, 'gameFocus'), desc: t(language, 'gameFocusDesc'), screen: 'game' },
+    { id: 'memory', emoji: '🃏', name: t(language, 'gameMemory'), desc: t(language, 'gameMemoryDesc'), screen: 'game-memory' },
+    { id: 'simon',  emoji: '🟥', name: t(language, 'gameSimon'), desc: t(language, 'gameSimonDesc'), screen: 'game-simon' },
+    { id: 'math',   emoji: '⚡', name: t(language, 'gameMath'), desc: t(language, 'gameMathDesc'), screen: 'game-math' },
+    { id: 'breath', emoji: '💨', name: t(language, 'gameBreath'), desc: t(language, 'gameBreathDesc'), screen: 'game-breath' },
+    { id: 'word',   emoji: '🔤', name: t(language, 'gameWord'), desc: t(language, 'gameWordDesc'), screen: 'game-word' },
+    { id: 'colour', emoji: '🎨', name: t(language, 'gameColour'), desc: t(language, 'gameColourDesc'), screen: 'game-colour' },
+    { id: 'odd',    emoji: '🕵️', name: t(language, 'gameOdd'), desc: t(language, 'gameOddDesc'), screen: 'game-odd' },
+    { id: 'order',  emoji: '🔢', name: t(language, 'gameOrder'), desc: t(language, 'gameOrderDesc'), screen: 'game-order' },
+  ]
 
   return (
     <motion.div
@@ -47,22 +48,22 @@ export default function ArcadeHub() {
         >
           <div>
             <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 800 }}>
-              🧠 Brain Rehab Arcade
+              🧠 {t(language, 'arcadeTitle')}
             </h1>
             <p className="text-muted text-sm" style={{ marginTop: 4 }}>
               {gamesPlayed === 0
-                ? 'Pick any game to start your rehab'
-                : `${gamesPlayed} / ${GAMES.length} played · ${totalScore} pts total`}
+                ? t(language, 'arcadePickAnyGame')
+                : t(language, 'arcadePlayed').replace('{count}', gamesPlayed).replace('{total}', GAMES.length).replace('{score}', totalScore)}
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             {gamesPlayed === GAMES.length && (
               <NeonButton onClick={() => setScreen('results')} variant="green" size="sm">
-                See Results →
+                {t(language, 'arcadeSeeResults')}
               </NeonButton>
             )}
             <NeonButton onClick={() => setScreen('diagnosis')} variant="outline" size="sm">
-              ← Back
+              ← {t(language, 'arcadeBack')}
             </NeonButton>
           </div>
         </motion.div>
@@ -89,7 +90,7 @@ export default function ArcadeHub() {
                       <span style={{ fontSize: '2rem', lineHeight: 1 }}>{game.emoji}</span>
                       {played && (
                         <span className="tier-chip tier-0" style={{ fontSize: '0.7rem' }}>
-                          Best: {score} pts
+                          {t(language, 'bestScore').replace('{score}', score)}
                         </span>
                       )}
                     </div>
@@ -105,7 +106,7 @@ export default function ArcadeHub() {
                       size="sm"
                       style={{ width: '100%' }}
                     >
-                      {played ? 'Play Again' : 'Play →'}
+                      {played ? t(language, 'playAgainButton') : t(language, 'playButton')}
                     </NeonButton>
                   </div>
                 </GlassCard>

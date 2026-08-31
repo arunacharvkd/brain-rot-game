@@ -48,6 +48,7 @@ export default function OddOneOut() {
   const [locked, setLocked] = useState(false)
   const [flashId, setFlashId] = useState(null)
   const { play } = useSound()
+  const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
@@ -121,13 +122,12 @@ export default function OddOneOut() {
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🕵️</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>Odd One Out</h2>
+            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'oddIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 24, lineHeight: 1.6 }}>
-              Find the different emoji as fast as you can.
-              12 dynamic rounds, {Q_TIME} seconds each.
+              {t(language, 'oddIntroText').replace('{count}', TOTAL).replace('{seconds}', Q_TIME)}
             </p>
             <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
-              Start →
+              {t(language, 'startButton')}
             </NeonButton>
           </div>
         ) : phase === 'done' ? (

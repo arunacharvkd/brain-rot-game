@@ -2,9 +2,10 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
-import { QUESTIONS } from '../data/questions'
+import { getQuestions } from '../data/questions'
 import { useSound } from '../hooks/useSound'
 import { trackEvent } from '../lib/analytics'
+import { t } from '../i18n/translations'
 
 export default function Quiz() {
   const [qIndex, setQIndex] = useState(0)
@@ -13,22 +14,24 @@ export default function Quiz() {
   const { play } = useSound()
   const setQuizScore = useGameStore((s) => s.setQuizScore)
   const setScreen = useGameStore((s) => s.setScreen)
+  const language = useGameStore((s) => s.language)
+  const questions = getQuestions(language)
 
-  const question = QUESTIONS[qIndex]
-  const progressPct = (qIndex / QUESTIONS.length) * 100
+  const question = questions[qIndex]
+  const progressPct = (qIndex / questions.length) * 100
 
   useEffect(() => {
-    trackEvent('quiz_started', { question_count: QUESTIONS.length })
+    trackEvent('quiz_started', { question_count: questions.length, language })
   }, [])
 
-  const handleSelect = (score) => {
+  const handleSelect = (score, optionIndex) => {
     if (selected !== null) return
     play('select')
-    setSelected(score)
+    setSelected(optionIndex)
 
     setTimeout(() => {
       const next = runningTotal + score
-      if (qIndex < QUESTIONS.length - 1) {
+      if (qIndex < questions.length - 1) {
         setRunningTotal(next)
         setQIndex((i) => i + 1)
         setSelected(null)
@@ -36,7 +39,7 @@ export default function Quiz() {
         setQuizScore(next)
         trackEvent('quiz_completed', {
           quiz_score: next,
-          question_count: QUESTIONS.length,
+          question_count: questions.length,
         })
         setScreen('reaction')
       }
@@ -48,7 +51,7 @@ export default function Quiz() {
     const handler = (e) => {
       if (selected !== null) return
       const idx = parseInt(e.key, 10) - 1
-      if (idx >= 0 && idx < question.options.length) handleSelect(question.options[idx].score)
+      if (idx >= 0 && idx < question.options.length) handleSelect(question.options[idx].score, idx)
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
@@ -77,7 +80,7 @@ export default function Quiz() {
               cursor: 'pointer',
             }}
           >
-            ← Back
+            ← {t(language, 'back')}
           </button>
         </div>
 
@@ -94,9 +97,9 @@ export default function Quiz() {
             }}
             className="text-mono"
           >
-            <span>Question {qIndex + 1} / {QUESTIONS.length}</span>
+            <span>{t(language, 'question')} {qIndex + 1} / {questions.length}</span>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span>Brain Rot Quiz</span>
+              <span>{t(language, 'quizTitle')}</span>
               <button
                 onClick={() => setScreen('landing')}
                 style={{
@@ -109,7 +112,7 @@ export default function Quiz() {
                   cursor: 'pointer',
                 }}
               >
-                ✕ Exit
+                ✕ {t(language, 'exit')}
               </button>
             </div>
           </div>
@@ -142,8 +145,8 @@ export default function Quiz() {
               {question.options.map((opt, i) => (
                 <motion.button
                   key={i}
-                  className={`quiz-option ${selected === opt.score && selected !== null ? 'selected' : ''}`}
-                  onClick={() => handleSelect(opt.score)}
+                  className={`quiz-option ${selected === i && selected !== null ? 'selected' : ''}`}
+                  onClick={() => handleSelect(opt.score, i)}
                   whileHover={{ x: 5 }}
                   whileTap={{ scale: 0.98 }}
                   disabled={selected !== null}

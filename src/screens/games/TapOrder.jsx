@@ -27,6 +27,7 @@ export default function TapOrder() {
   const [locked, setLocked] = useState(false)
   const [selected, setSelected] = useState([])
   const { play } = useSound()
+  const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
@@ -112,13 +113,12 @@ export default function TapOrder() {
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🔢</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>Tap Order</h2>
+            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'orderIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 24, lineHeight: 1.6 }}>
-              Tap numbers in ascending order (1 to 6) before time runs out.
-              {` ${TOTAL}`} rounds.
+              {t(language, 'orderIntroText').replace('{count}', TOTAL)}
             </p>
             <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
-              Start →
+              {t(language, 'startButton')}
             </NeonButton>
           </div>
         ) : phase === 'done' ? (

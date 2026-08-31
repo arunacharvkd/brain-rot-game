@@ -5,6 +5,7 @@ import GlassCard from '../components/GlassCard'
 import NeonButton from '../components/NeonButton'
 import { useSound } from '../hooks/useSound'
 import { trackEvent } from '../lib/analytics'
+import { t } from '../i18n/translations'
 
 const TOTAL_ROUNDS = 5
 const DISTRACTORS = ['📱', '🤡', '📺', '💀', '🎮']
@@ -29,6 +30,7 @@ export default function ReactionTest() {
   const startRef = useRef(null)
   const waitTimerRef = useRef(null)
   const { play } = useSound()
+  const language = useGameStore((s) => s.language)
   const setReactionScore = useGameStore((s) => s.setReactionScore)
   const setScreen = useGameStore((s) => s.setScreen)
 
@@ -131,16 +133,16 @@ export default function ReactionTest() {
               cursor: 'pointer',
             }}
           >
-            ← Back to Quiz
+            ← {t(language, 'backToQuiz')}
           </button>
         </div>
 
         <div style={{ textAlign: 'center', marginBottom: 24 }}>
           <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 6 }}>
-            Part 2: Prove You're Not an NPC
+            {t(language, 'reactionTitle')}
           </h2>
           <p className="text-muted text-sm">
-            Click 🧠 the moment it appears — {TOTAL_ROUNDS} rounds
+            {t(language, 'reactionSubtitle').replace('{count}', TOTAL_ROUNDS)}
           </p>
         </div>
 
@@ -174,7 +176,7 @@ export default function ReactionTest() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
               >
-                Get ready...
+                {t(language, 'getReady')}
               </motion.div>
             )}
 
@@ -227,7 +229,7 @@ export default function ReactionTest() {
               >
                 <span style={{ fontSize: '2.5rem' }}>✅</span>
                 <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                  Calculating results...
+                  {t(language, 'calculatingResults')}
                 </span>
               </motion.div>
             )}
@@ -253,7 +255,7 @@ export default function ReactionTest() {
               setCountdown(3)
               setPhase('countdown')
             }} variant="purple">
-              Start Reaction Test →
+              {t(language, 'startReactionTest')}
             </NeonButton>
           )}
 
@@ -268,7 +270,7 @@ export default function ReactionTest() {
           )}
 
           <p className="text-muted text-xs text-mono" style={{ marginTop: 12 }}>
-            Round {Math.min(roundIndex + 1, TOTAL_ROUNDS)} / {TOTAL_ROUNDS}
+            {t(language, 'roundLabel').replace('{current}', Math.min(roundIndex + 1, TOTAL_ROUNDS)).replace('{total}', TOTAL_ROUNDS)}
           </p>
         </div>
       </GlassCard>

@@ -33,6 +33,7 @@ export default function ColourWord() {
   const [feedback, setFeedback] = useState(null) // null | colourName
   const [locked, setLocked] = useState(false)
   const { play } = useSound()
+  const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
@@ -107,18 +108,16 @@ export default function ColourWord() {
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🎨</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>Colour vs Word</h2>
+            <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'colourIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 16, lineHeight: 1.6 }}>
-              A colour word is shown in a <em>different</em> ink colour.
-              Click the <strong style={{ color: '#fff' }}>ink colour</strong> — not what the word says!
+              {t(language, 'colourIntroText')}
             </p>
-            {/* Example */}
             <div style={{ marginBottom: 28 }}>
               <span style={{ fontSize: '2rem', fontWeight: 800, color: '#3b82f6' }}>RED</span>
-              <p className="text-xs text-muted" style={{ marginTop: 4 }}>→ Click BLUE (the ink)</p>
+              <p className="text-xs text-muted" style={{ marginTop: 4 }}>{t(language, 'colourExample')}</p>
             </div>
             <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
-              Start →
+              {t(language, 'startButton')}
             </NeonButton>
           </div>
         ) : phase === 'done' ? (

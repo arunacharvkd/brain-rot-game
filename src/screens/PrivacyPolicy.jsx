@@ -1,11 +1,13 @@
 import { motion } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
+import { t } from '../i18n/translations'
 
 const LAST_UPDATED = 'August 19, 2026'
 
 export default function PrivacyPolicy() {
   const setScreen = useGameStore((s) => s.setScreen)
+  const language = useGameStore((s) => s.language)
 
   return (
     <motion.div
@@ -17,14 +19,14 @@ export default function PrivacyPolicy() {
     >
       <div className="privacy-container">
         <div style={{ marginBottom: 24, display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
-          <h1 style={{ fontSize: '1.6rem', fontWeight: 800 }}>Privacy Policy</h1>
-          <NeonButton onClick={() => setScreen('landing')} variant="outline" size="sm">← Back</NeonButton>
+          <h1 style={{ fontSize: '1.6rem', fontWeight: 800 }}>{t(language, 'privacyPageTitle')}</h1>
+          <NeonButton onClick={() => setScreen('landing')} variant="outline" size="sm">← {t(language, 'back')}</NeonButton>
         </div>
 
-        <p className="privacy-meta">Last updated: {LAST_UPDATED}</p>
+        <p className="privacy-meta">{t(language, 'lastUpdated')}: {LAST_UPDATED}</p>
 
         <section className="privacy-section">
-          <h2>About This Site</h2>
+          <h2>{t(language, 'aboutThisSite')}</h2>
           <p>
             Brain Rot Checker (<strong>brainrotchecker.com</strong>) is a free, browser-based entertainment
             and brain training game. It is designed purely for fun and light-hearted self-reflection.

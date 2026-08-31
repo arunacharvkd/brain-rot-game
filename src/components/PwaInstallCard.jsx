@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import NeonButton from './NeonButton'
 import { trackEvent } from '../lib/analytics'
+import useGameStore from '../store/gameStore'
+import { t } from '../i18n/translations'
 
 const INSTALL_GUIDES = {
   desktop: [
@@ -36,10 +38,11 @@ function isStandaloneMode() {
 }
 
 export default function PwaInstallCard() {
+  const language = useGameStore((s) => s.language)
   const [activeGuide, setActiveGuide] = useState(guessPlatform)
   const [deferredPrompt, setDeferredPrompt] = useState(null)
   const [status, setStatus] = useState(() => (isStandaloneMode() ? 'installed' : 'idle'))
-  const [showGuide, setShowGuide] = useState(() => !isStandaloneMode())
+  const [showGuide, setShowGuide] = useState(false)
   const [toastText, setToastText] = useState('')
 
   const canPromptInstall = useMemo(() => Boolean(deferredPrompt), [deferredPrompt])
@@ -55,7 +58,7 @@ export default function PwaInstallCard() {
       setStatus('installed')
       setDeferredPrompt(null)
       setShowGuide(false)
-      setToastText('App installed successfully.')
+      setToastText(t(language, 'installSuccess'))
       trackEvent('pwa_installed')
     }
 
@@ -75,7 +78,12 @@ export default function PwaInstallCard() {
   }, [toastText])
 
   const installNow = async () => {
-    if (!deferredPrompt) return
+    setShowGuide(true)
+
+    if (!deferredPrompt) {
+      setStatus('idle')
+      return
+    }
 
     setStatus('waiting')
     trackEvent('pwa_install_clicked')
@@ -85,25 +93,25 @@ export default function PwaInstallCard() {
 
     if (choice?.outcome === 'accepted') {
       setStatus('installed')
-      setShowGuide(false)
-      setToastText('App installed successfully.')
+      setShowGuide(true)
+      setToastText(t(language, 'installSuccess'))
       trackEvent('pwa_install_choice', { outcome: 'accepted' })
       return
     }
 
     setStatus('dismissed')
-    setToastText('Install canceled. You can try again anytime.')
+    setShowGuide(true)
+    setToastText(t(language, 'installCancelled'))
     trackEvent('pwa_install_choice', { outcome: 'dismissed' })
   }
 
   return (
     <div className="landing-install-card">
       <div className="landing-install-head">
-        <p className="landing-sponsor-eyebrow">Installable PWA</p>
-        <h2>Install BrainRotChecker Like an App</h2>
+        <p className="landing-sponsor-eyebrow">{t(language, 'installablePwa')}</p>
+        <h2>{t(language, 'installTitle')}</h2>
         <p className="landing-block-intro">
-          Save it to your device for quicker launch and a full-screen app feel.
-          You can switch install instructions based on your device.
+          {t(language, 'installBody')}
         </p>
       </div>
 
@@ -113,21 +121,21 @@ export default function PwaInstallCard() {
             <NeonButton
               variant="green"
               onClick={installNow}
-              disabled={!canPromptInstall || status === 'waiting'}
+              disabled={status === 'waiting'}
             >
-              Install App
+              {t(language, 'installButton')}
             </NeonButton>
             {!canPromptInstall && (
-              <span className="landing-install-note">Install prompt not available on this browser yet. Use guide below.</span>
+              <span className="landing-install-note">{t(language, 'installPromptNote')}</span>
             )}
           </>
         )}
-        {status === 'installed' && <span className="landing-install-ok">Installed on this device</span>}
+        {status === 'installed' && <span className="landing-install-ok">{t(language, 'installedOnThisDevice')}</span>}
       </div>
 
       {status === 'installed' && (
         <button className="landing-install-guide-toggle" onClick={() => setShowGuide((v) => !v)}>
-          {showGuide ? 'Hide Setup Guides' : 'Show Setup Guides for Other Devices'}
+          {showGuide ? t(language, 'hideSetupGuides') : t(language, 'showSetupGuides')}
         </button>
       )}
 
@@ -141,7 +149,7 @@ export default function PwaInstallCard() {
                 trackEvent('pwa_install_guide_selected', { platform: 'desktop' })
               }}
             >
-              Desktop
+              {t(language, 'desktop')}
             </button>
             <button
               className={activeGuide === 'android' ? 'is-active' : ''}
@@ -150,7 +158,7 @@ export default function PwaInstallCard() {
                 trackEvent('pwa_install_guide_selected', { platform: 'android' })
               }}
             >
-              Android
+              {t(language, 'android')}
             </button>
             <button
               className={activeGuide === 'ios' ? 'is-active' : ''}
@@ -159,7 +167,7 @@ export default function PwaInstallCard() {
                 trackEvent('pwa_install_guide_selected', { platform: 'ios' })
               }}
             >
-              iPhone/iPad
+              {t(language, 'ios')}
             </button>
           </div>
 
