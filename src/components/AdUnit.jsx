@@ -5,7 +5,8 @@ const AD_CLIENT = 'ca-pub-2337245858816005'
 export default function AdUnit({ slot, format = 'auto', className = '' }) {
   const pushed = useRef(false)
   // Real AdSense slot IDs are numeric; anything else is a placeholder awaiting approval.
-  const isRealSlot = /^\d+$/.test(String(slot))
+  // Only render live ads in production — an unfilled/unapproved ad's iframe can trap mouse-wheel scroll during local dev.
+  const isRealSlot = import.meta.env.PROD && /^\d+$/.test(String(slot))
 
   useEffect(() => {
     if (!isRealSlot || pushed.current) return
