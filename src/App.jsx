@@ -95,6 +95,21 @@ export default function App() {
     return () => window.removeEventListener('popstate', handlePopState)
   }, [setScreen])
 
+  // AdSense's responsive-ad script forces height:auto/!important onto ancestor elements
+  // to measure itself, which breaks our fixed-viewport app shell — strip it back off.
+  useEffect(() => {
+    const guarded = [document.getElementById('root'), document.querySelector('.app')].filter(Boolean)
+    const observer = new MutationObserver((mutations) => {
+      for (const mutation of mutations) {
+        if (mutation.attributeName === 'style' && mutation.target.getAttribute('style')) {
+          mutation.target.removeAttribute('style')
+        }
+      }
+    })
+    guarded.forEach((el) => observer.observe(el, { attributes: true, attributeFilter: ['style'] }))
+    return () => observer.disconnect()
+  }, [])
+
   return (
     <div className="app">
       {!isGameScreen && (

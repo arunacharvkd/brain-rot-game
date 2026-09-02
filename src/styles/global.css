@@ -128,6 +128,8 @@ a { color: inherit; text-decoration: none; }
   margin-top: 20px;
   border-radius: var(--r-md);
   overflow: hidden;
+  display: flex;
+  justify-content: center;
 }
 .ad-unit--arcade {
   margin-top: 28px;
