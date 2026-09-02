@@ -3,6 +3,7 @@ import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import NeonButton from '../components/NeonButton'
 import AdUnit from '../components/AdUnit'
+import { AD_SLOTS } from '../data/ads'
 import { t } from '../i18n/translations'
 
 export default function ArcadeHub() {
@@ -117,7 +118,7 @@ export default function ArcadeHub() {
         </div>
 
         {/* TODO: replace 'arcade-hub-mid' with real AdSense ad unit slot id once approved */}
-        <AdUnit slot="arcade-hub-mid" className="arcade-hub-ad" />
+        <AdUnit slot={AD_SLOTS.arcade} className="arcade-hub-ad" />
       </div>
     </motion.div>
   )

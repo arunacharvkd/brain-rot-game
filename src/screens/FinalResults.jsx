@@ -7,6 +7,7 @@ import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
 import AdUnit from '../components/AdUnit'
 import { TIERS, calcFinalTier, SPONSOR } from '../data/tiers'
+import { AD_SLOTS } from '../data/ads'
 import { useSound } from '../hooks/useSound'
 import { trackEvent } from '../lib/analytics'
 import { t } from '../i18n/translations'
@@ -167,8 +168,8 @@ export default function FinalResults() {
           </NeonButton>
         </motion.div>
 
-        {/* TODO: replace 'final-results-below-share' with real AdSense ad unit slot id once approved */}
-        <AdUnit slot="final-results-below-share" className="results-ad" />
+        {/* AdSense: below Share/Play Again buttons */}
+        <AdUnit slot={AD_SLOTS.results} className="results-ad" />
 
         {SPONSOR.active && (
           <motion.div

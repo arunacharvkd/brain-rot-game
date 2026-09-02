@@ -5,6 +5,7 @@ import NeonButton from '../components/NeonButton'
 import PwaInstallCard from '../components/PwaInstallCard'
 import AdUnit from '../components/AdUnit'
 import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
+import { AD_SLOTS } from '../data/ads'
 import { trackEvent } from '../lib/analytics'
 import { t, LANGUAGES } from '../i18n/translations'
 
@@ -285,10 +286,9 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* TODO: replace 'landing-below-hero' with real AdSense ad unit slot id once approved */}
         <section className="landing-section">
           <div className="landing-block">
-            <AdUnit slot="landing-below-hero" className="landing-hero-ad" />
+            <AdUnit slot={AD_SLOTS.landing} className="landing-hero-ad" />
           </div>
         </section>
 
