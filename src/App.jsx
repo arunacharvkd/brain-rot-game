@@ -52,6 +52,7 @@ export default function App() {
   const setLanguage = useGameStore((s) => s.setLanguage)
   const Screen = SCREENS[screen] ?? Landing
   const isGameScreen = screen === 'game' || screen.startsWith('game-')
+  const isLandingScreen = screen === 'landing'
   const hasTrackedSessionRef = useRef(false)
 
   useEffect(() => {
@@ -82,27 +83,30 @@ export default function App() {
         <>
           <div className="bg-orb bg-orb-1" />
           <div className="bg-orb bg-orb-2" />
+          <div className="bg-orb bg-orb-3" />
         </>
       )}
-      <div className="app-controls">
-        <label className="language-picker">
-          <span className="sr-only">Language</span>
-          <select value={language} onChange={(event) => setLanguage(event.target.value)}>
-            {LANGUAGES.map(({ code, label }) => <option key={code} value={code}>{label}</option>)}
-          </select>
-        </label>
-        <button
-          onClick={toggleMute}
-          title={muted ? 'Unmute' : 'Mute'}
-          className="sound-toggle"
-        >
-          {muted ? '🔇' : '🔊'}
-        </button>
-      </div>
+      {!isLandingScreen && (
+        <div className="app-controls">
+          <label className="language-picker">
+            <span className="sr-only">Language</span>
+            <select value={language} onChange={(event) => setLanguage(event.target.value)}>
+              {LANGUAGES.map(({ code, label }) => <option key={code} value={code}>{label}</option>)}
+            </select>
+          </label>
+          <button
+            onClick={toggleMute}
+            title={muted ? 'Unmute' : 'Mute'}
+            className="sound-toggle"
+          >
+            {muted ? '🔇' : '🔊'}
+          </button>
+        </div>
+      )}
       <AnimatePresence mode="wait">
         <Screen key={screen} />
       </AnimatePresence>
-      {!isGameScreen && <Footer />}
+      {!isGameScreen && !isLandingScreen && <Footer />}
     </div>
   )
 }

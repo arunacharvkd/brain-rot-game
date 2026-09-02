@@ -4,6 +4,7 @@ import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
 import { useSound } from '../../hooks/useSound'
+import { t } from '../../i18n/translations'
 
 const WORD_LIST = [
   'FOCUS', 'BRAIN', 'LEARN', 'SLEEP', 'WATER', 'THINK', 'RELAX', 'CLEAR', 'QUIET', 'PEACE',
@@ -123,8 +124,8 @@ export default function WordScramble() {
   useEffect(() => {
     if (phase !== 'playing' || locked) return
     if (timeLeft <= 0) { advance(false); return }
-    const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000)
-    return () => clearTimeout(t)
+    const tid = setTimeout(() => setTimeLeft((s) => s - 1), 1000)
+    return () => clearTimeout(tid)
   }, [timeLeft, phase, locked])
 
   const timerPct = (timeLeft / Q_TIME) * 100

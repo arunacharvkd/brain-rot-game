@@ -4,6 +4,7 @@ import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
 import { useSound } from '../../hooks/useSound'
+import { t } from '../../i18n/translations'
 
 const COLOURS = [
   { name: 'RED',    value: '#ef4444' },
@@ -90,8 +91,8 @@ export default function ColourWord() {
   useEffect(() => {
     if (phase !== 'playing' || locked) return
     if (timeLeft <= 0) { advance(null); return }
-    const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000)
-    return () => clearTimeout(t)
+    const tid = setTimeout(() => setTimeLeft((s) => s - 1), 1000)
+    return () => clearTimeout(tid)
   }, [timeLeft, phase, locked])
 
   const timerPct = (timeLeft / Q_TIME) * 100

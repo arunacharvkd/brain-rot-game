@@ -9,7 +9,7 @@ export default function Footer() {
     <footer className="global-footer">
       <span>© 2026 Brain Rot Checker · {t(language, 'footerNote')}</span>
       <div className="global-footer-links">
-        <button onClick={() => setScreen('privacy')}>{t(language, 'privacyPolicy')}</button>
+        <button role="link" onClick={() => setScreen('privacy')}>{t(language, 'privacyPolicy')}</button>
         <a href="mailto:vkdarunacharya@gmail.com">{t(language, 'contact')}</a>
       </div>
     </footer>

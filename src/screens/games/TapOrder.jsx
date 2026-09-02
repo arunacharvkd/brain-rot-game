@@ -4,6 +4,7 @@ import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
 import { useSound } from '../../hooks/useSound'
+import { t } from '../../i18n/translations'
 
 const TOTAL = 8
 const Q_TIME = 7
@@ -63,8 +64,8 @@ export default function TapOrder() {
       finishRound(false)
       return
     }
-    const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000)
-    return () => clearTimeout(t)
+    const tid = setTimeout(() => setTimeLeft((s) => s - 1), 1000)
+    return () => clearTimeout(tid)
   }, [phase, locked, timeLeft, finishRound])
 
   const handleTap = (cell) => {
