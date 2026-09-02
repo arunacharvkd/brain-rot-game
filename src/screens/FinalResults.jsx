@@ -5,6 +5,7 @@ import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
+import AdUnit from '../components/AdUnit'
 import { TIERS, calcFinalTier, SPONSOR } from '../data/tiers'
 import { useSound } from '../hooks/useSound'
 import { trackEvent } from '../lib/analytics'
@@ -165,6 +166,9 @@ export default function FinalResults() {
             {t(language, 'playAgain')}
           </NeonButton>
         </motion.div>
+
+        {/* TODO: replace 'final-results-below-share' with real AdSense ad unit slot id once approved */}
+        <AdUnit slot="final-results-below-share" className="results-ad" />
 
         {SPONSOR.active && (
           <motion.div

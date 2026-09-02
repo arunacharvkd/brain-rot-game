@@ -4,7 +4,9 @@ import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
+import AdUnit from '../components/AdUnit'
 import { TIERS, scoreToTier, SPONSOR } from '../data/tiers'
+import { AD_SLOTS } from '../data/ads'
 import { trackEvent } from '../lib/analytics'
 import { t } from '../i18n/translations'
 
@@ -113,6 +115,8 @@ export default function Diagnosis() {
             </p>
           )}
         </motion.div>
+
+        <AdUnit slot={AD_SLOTS.diagnosis} />
       </GlassCard>
     </motion.div>
   )

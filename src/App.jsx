@@ -20,6 +20,7 @@ import TapOrder from './screens/games/TapOrder'
 import Footer from './components/Footer'
 import { trackEvent, trackScreenView } from './lib/analytics'
 import { LANGUAGES } from './i18n/translations'
+import { getPathFromScreen, getScreenFromPath } from './lib/routes'
 
 const SCREENS = {
   landing:        Landing,
@@ -41,6 +42,7 @@ const SCREENS = {
 }
 
 export default function App() {
+  const setScreen = useGameStore((s) => s.setScreen)
   const screen = useGameStore((s) => s.screen)
   const muted = useGameStore((s) => s.muted)
   const quizScore = useGameStore((s) => s.quizScore)
@@ -76,6 +78,22 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = language
   }, [language])
+
+  // Keep the URL in sync with the active screen so each screen is a distinct, crawlable page.
+  useEffect(() => {
+    const path = getPathFromScreen(screen)
+    if (window.location.pathname !== path) {
+      window.history.pushState({ screen }, '', path)
+    }
+  }, [screen])
+
+  useEffect(() => {
+    const handlePopState = () => {
+      setScreen(getScreenFromPath(window.location.pathname))
+    }
+    window.addEventListener('popstate', handlePopState)
+    return () => window.removeEventListener('popstate', handlePopState)
+  }, [setScreen])
 
   return (
     <div className="app">

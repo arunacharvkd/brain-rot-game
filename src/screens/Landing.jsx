@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
 import PwaInstallCard from '../components/PwaInstallCard'
+import AdUnit from '../components/AdUnit'
 import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
 import { trackEvent } from '../lib/analytics'
 import { t, LANGUAGES } from '../i18n/translations'
@@ -284,6 +285,13 @@ export default function Landing() {
           </div>
         </section>
 
+        {/* TODO: replace 'landing-below-hero' with real AdSense ad unit slot id once approved */}
+        <section className="landing-section">
+          <div className="landing-block">
+            <AdUnit slot="landing-below-hero" className="landing-hero-ad" />
+          </div>
+        </section>
+
         {/* <section id="install" className="landing-section">
           <div className="landing-block">
             <PwaInstallCard />
@@ -293,15 +301,19 @@ export default function Landing() {
         <section id="about" className="landing-section">
           <div className="landing-block">
             <h2>{t(language, 'productHeading')}</h2>
+            <p className="landing-block-intro">{t(language, 'productBody')}</p>
             <div className="landing-feature-grid">
               <div className="landing-feature-item">
                 <h3>01 {t(language, 'diagnoseHabits')}</h3>
+                <p>{t(language, 'diagnoseHabitsText')}</p>
               </div>
               <div className="landing-feature-item">
                 <h3>02 {t(language, 'rehabThroughPlay')}</h3>
+                <p>{t(language, 'rehabThroughPlayText')}</p>
               </div>
               <div className="landing-feature-item">
                 <h3>03 {t(language, 'trackProgress')}</h3>
+                <p>{t(language, 'trackProgressText')}</p>
               </div>
             </div>
           </div>

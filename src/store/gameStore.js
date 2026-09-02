@@ -1,11 +1,12 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { trackEvent, trackGameStart, trackGameComplete } from '../lib/analytics'
+import { getScreenFromPath } from '../lib/routes'
 
 const useGameStore = create(
   persist(
     (set) => ({
-      screen: 'landing',
+      screen: typeof window !== 'undefined' ? getScreenFromPath(window.location.pathname) : 'landing',
       quizScore: 0,
       reactionScore: 0,
       diagnosisTier: 0,
