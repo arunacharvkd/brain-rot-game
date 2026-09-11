@@ -181,7 +181,7 @@ export default function App() {
           </div>
         </>
       )}
-      {challenge && !isLandingScreen && !isGameScreen && screen !== 'reaction' && (
+      {challenge && !isLandingScreen && !isGameScreen && screen !== 'reaction' && screen !== 'results' && (
         <ChallengeBanner />
       )}
       <Suspense fallback={<div className="screen screen-loading">Loading…</div>}>
