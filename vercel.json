@@ -1,6 +1,10 @@
 {
   "rewrites": [
     {
+      "source": "/s",
+      "destination": "/api/share"
+    },
+    {
       "source": "/((?!ads.txt|robots.txt|sitemap.xml|api/).*)",
       "destination": "/index.html"
     }

@@ -146,7 +146,7 @@ export default function Game() {
           Round {round}/3
         </div>
         <button
-          onClick={() => setScreen('arcade')}
+          onClick={() => useGameStore.getState().exitToHub()}
           style={{
             background: 'none',
             border: '1px solid rgba(255,255,255,0.15)',
@@ -230,7 +230,7 @@ export default function Game() {
               <GameDone
                 title="🎉 REHAB COMPLETE"
                 scoreLabel={`Score: ${score} pts`}
-                onContinue={() => setScreen('arcade')}
+                onContinue={() => useGameStore.getState().exitToHub()}
                 onPlayAgain={handlePlayAgain}
               />
             )}

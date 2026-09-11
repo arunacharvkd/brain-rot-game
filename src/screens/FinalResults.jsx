@@ -12,6 +12,8 @@ import { AD_SLOTS } from '../data/ads'
 import { useSound } from '../hooks/useSound'
 import { trackEvent } from '../lib/analytics'
 import { t } from '../i18n/translations'
+import { buildRunPayload, shareAbsoluteUrl, whoMoreNpc } from '../lib/codec'
+import { renderResultCardBlob, resultShareText, shareResult } from '../lib/shareCard'
 
 function getVerdict(before, after) {
   if (after < before) {
@@ -25,18 +27,13 @@ function getVerdict(before, after) {
   return 'Even this session is brain training! Play again — every round counts. 🧠'
 }
 
-function getSharePayload(before, after, totalScore, gamesPlayed) {
-  const url = typeof window !== 'undefined' ? window.location.origin : 'https://brainrotchecker.com'
-  const text = [
-    '🧠 Brain Rot Test Results',
-    `Diagnosis: ${TIERS[before].emoji} ${TIERS[before].label}`,
-    `After Rehab: ${TIERS[after].emoji} ${TIERS[after].label}`,
-    `Total Score: ${totalScore} pts across ${gamesPlayed} game${gamesPlayed !== 1 ? 's' : ''}`,
-    '',
-    'Are you cooked? Find out:',
-    url,
-  ].join('\n')
-  return { title: 'Brain Rot Test Results', text, url }
+function visitDelta(previous, current) {
+  if (!previous) return null
+  const scoreDiff = current.totalScore - previous.totalScore
+  const tierDiff = previous.finalTier - current.finalTier
+  if (scoreDiff > 0 || tierDiff > 0) return 'better'
+  if (scoreDiff < 0 || tierDiff < 0) return 'worse'
+  return 'same'
 }
 
 const fadeUp = (delay = 0) => ({
@@ -48,13 +45,22 @@ const fadeUp = (delay = 0) => ({
 export default function FinalResults() {
   const diagnosisTier = useGameStore((s) => s.diagnosisTier)
   const arcadeScores = useGameStore((s) => s.arcadeScores)
+  const quizScore = useGameStore((s) => s.quizScore)
+  const reactionScore = useGameStore((s) => s.reactionScore)
   const setFinalTier = useGameStore((s) => s.setFinalTier)
   const setScreen = useGameStore((s) => s.setScreen)
   const finalTier = useGameStore((s) => s.finalTier)
   const reset = useGameStore((s) => s.reset)
   const language = useGameStore((s) => s.language)
+  const recordVisit = useGameStore((s) => s.recordVisit)
+  const challenge = useGameStore((s) => s.challenge)
   const { play } = useSound()
   const [copied, setCopied] = useState(false)
+  const [toast, setToast] = useState('')
+  const [cardUrl, setCardUrl] = useState('')
+  const [cardBlobUrl, setCardBlobUrl] = useState('')
+  const [friendName, setFriendName] = useState('Friend')
+  const [progress, setProgress] = useState(null)
 
   const totalScore = Object.values(arcadeScores).reduce((a, b) => a + b, 0)
   const gamesPlayed = Object.keys(arcadeScores).length
@@ -62,6 +68,12 @@ export default function FinalResults() {
   useEffect(() => {
     const computed = calcFinalTier(diagnosisTier, arcadeScores)
     setFinalTier(computed)
+    const visit = recordVisit({
+      totalScore,
+      diagnosisTier,
+      finalTier: computed,
+    })
+    setProgress(visitDelta(visit.previous, visit.current))
     trackEvent('rehab_completed', {
       diagnosis_tier: diagnosisTier,
       final_tier: computed,
@@ -83,29 +95,98 @@ export default function FinalResults() {
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const verdict = getVerdict(diagnosisTier, finalTier)
+  const runState = { quizScore, reactionScore, diagnosisTier, arcadeScores, finalTier }
 
   const handleShare = async () => {
-    const payload = getSharePayload(diagnosisTier, finalTier, totalScore, gamesPlayed)
-    if (navigator.share) {
-      try {
-        await navigator.share(payload)
-        trackEvent('result_shared', { method: 'native_share' })
-        return
-      } catch {}
-    }
+    const payload = buildRunPayload('r', runState, friendName)
+    const url = shareAbsoluteUrl(payload)
+    setCardUrl(url)
+    const text = resultShareText({
+      diagnosisTier,
+      finalTier,
+      totalScore,
+      gamesPlayed,
+      url,
+    })
     try {
-      await navigator.clipboard.writeText(payload.text)
-      trackEvent('result_shared', { method: 'clipboard' })
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2400)
+      const blob = await renderResultCardBlob({
+        diagnosisTier,
+        finalTier,
+        totalScore,
+        gamesPlayed,
+        name: friendName !== 'Friend' ? friendName : '',
+      })
+      const objectUrl = URL.createObjectURL(blob)
+      setCardBlobUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev)
+        return objectUrl
+      })
+      const method = await shareResult({
+        title: 'Brain Rot Test Results',
+        text,
+        url,
+        blob,
+      })
+      trackEvent('result_shared', { method })
+      if (method === 'clipboard') {
+        setCopied(true)
+        setToast(t(language, 'copiedClipboard'))
+        setTimeout(() => setCopied(false), 2400)
+      }
     } catch {
-      /* clipboard blocked */
+      try {
+        await navigator.clipboard.writeText(`${text}\n${url}`)
+        setCopied(true)
+        setToast(t(language, 'copiedClipboard'))
+        setTimeout(() => setCopied(false), 2400)
+        trackEvent('result_shared', { method: 'clipboard_fallback' })
+      } catch {
+        setCardUrl(url)
+      }
     }
   }
 
+  const handleChallenge = async () => {
+    const payload = buildRunPayload('c', runState, friendName)
+    const url = shareAbsoluteUrl(payload)
+    setCardUrl(url)
+    const text = t(language, 'challengeShareText').replace('{name}', friendName).replace('{url}', url)
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: t(language, 'challengeTitle'), text, url })
+        trackEvent('challenge_created', { method: 'native_share' })
+      } else {
+        await navigator.clipboard.writeText(url)
+        setCopied(true)
+        setToast(t(language, 'challengeCopied'))
+        setTimeout(() => setCopied(false), 2400)
+        trackEvent('challenge_created', { method: 'clipboard' })
+      }
+    } catch {
+      try {
+        await navigator.clipboard.writeText(url)
+        setCopied(true)
+        setToast(t(language, 'challengeCopied'))
+        setTimeout(() => setCopied(false), 2400)
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  const npc = challenge
+    ? whoMoreNpc(challenge, {
+        d: diagnosisTier,
+        f: finalTier,
+        q: quizScore,
+        r: reactionScore,
+        s: totalScore,
+      })
+    : null
+
   return (
     <motion.div
-      className="screen"
+      className="screen results-screen"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -136,7 +217,42 @@ export default function FinalResults() {
           {verdict}
         </motion.p>
 
-        {/* Before / After meters */}
+        {progress && (
+          <motion.p
+            className={`visit-delta visit-delta--${progress}`}
+            {...fadeUp(0.22)}
+          >
+            {progress === 'better' && t(language, 'visitBetter')}
+            {progress === 'worse' && t(language, 'visitWorse')}
+            {progress === 'same' && t(language, 'visitSame')}
+          </motion.p>
+        )}
+
+        {npc && (
+          <motion.div className="npc-compare" {...fadeUp(0.24)}>
+            <p className="npc-compare-kicker">{t(language, 'npcCompareTitle')}</p>
+            <div className="npc-compare-row">
+              <div>
+                <strong>{challenge.n}</strong>
+                <span>{TIERS[challenge.d].emoji} {TIERS[challenge.d].label}</span>
+                <span className="text-mono">{challenge.s} pts</span>
+              </div>
+              <div>
+                <strong>{t(language, 'npcYou')}</strong>
+                <span>{TIERS[diagnosisTier].emoji} {TIERS[diagnosisTier].label}</span>
+                <span className="text-mono">{totalScore} pts</span>
+              </div>
+            </div>
+            <p className="npc-compare-verdict">
+              {npc === 'tie'
+                ? t(language, 'npcTie')
+                : npc === 'a'
+                  ? t(language, 'npcTheyWin').replace('{name}', challenge.n)
+                  : t(language, 'npcYouWin')}
+            </p>
+          </motion.div>
+        )}
+
         <motion.div className="results-meters" {...fadeUp(0.28)}>
           <div className="results-meter-col">
             <BrainRotMeter tier={diagnosisTier} label={t(language, 'before')} />
@@ -163,6 +279,25 @@ export default function FinalResults() {
           <span style={{ color: 'var(--text-muted)', marginLeft: 12 }}>{t(language, 'across')} {gamesPlayed} {gamesPlayed === 1 ? t(language, 'game') : t(language, 'games')}</span>
         </motion.p>
 
+        {cardBlobUrl && (
+          <motion.img
+            className="share-card-preview"
+            src={cardBlobUrl}
+            alt="Shareable result card"
+            {...fadeUp(0.4)}
+          />
+        )}
+
+        <label className="challenge-name-field">
+          <span className="sr-only">{t(language, 'challengeNameLabel')}</span>
+          <input
+            value={friendName}
+            maxLength={18}
+            onChange={(e) => setFriendName(e.target.value)}
+            placeholder={t(language, 'challengeNameLabel')}
+          />
+        </label>
+
         <motion.div
           {...fadeUp(0.44)}
           style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}
@@ -170,12 +305,20 @@ export default function FinalResults() {
           <NeonButton onClick={handleShare} variant="purple">
             {copied ? t(language, 'copied') : t(language, 'share')}
           </NeonButton>
+          <NeonButton onClick={handleChallenge} variant="green">
+            {t(language, 'challengeCta')}
+          </NeonButton>
           <NeonButton onClick={reset} variant="outline">
             {t(language, 'playAgain')}
           </NeonButton>
         </motion.div>
 
-        {/* AdSense after the share/play-again break */}
+        {cardUrl && (
+          <p className="share-link-preview text-sm text-muted">
+            {cardUrl}
+          </p>
+        )}
+
         <AdUnit slot={AD_SLOTS.results} className="results-ad" />
 
         {SPONSOR.active && (
@@ -219,16 +362,15 @@ export default function FinalResults() {
         )}
       </GlassCard>
 
-      {/* Toast */}
       <AnimatePresence>
-        {copied && (
+        {(copied || toast) && (
           <motion.div
             className="toast"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
           >
-            {t(language, 'copiedClipboard')}
+            {toast || t(language, 'copiedClipboard')}
           </motion.div>
         )}
       </AnimatePresence>

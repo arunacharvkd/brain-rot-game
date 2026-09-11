@@ -157,7 +157,7 @@ export default function WordScramble() {
             emoji="📖"
             title="Word Master!"
             scoreLabel={`${score} / ${TOTAL * 10} pts`}
-            onContinue={() => setScreen('arcade')}
+            onContinue={() => useGameStore.getState().exitToHub()}
             onPlayAgain={handlePlayAgain}
           />
         ) : (
@@ -177,7 +177,7 @@ export default function WordScramble() {
               </div>
               <span className="text-mono text-xs" style={{ color: 'var(--green)' }}>{score} pts</span>
               <button
-                onClick={() => setScreen('arcade')}
+                onClick={() => useGameStore.getState().exitToHub()}
                 style={{
                   background: 'none',
                   border: '1px solid rgba(255,255,255,0.15)',

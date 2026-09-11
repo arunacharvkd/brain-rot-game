@@ -11,6 +11,8 @@ export default function GameDone({
   onPlayAgain,
 }) {
   const language = useGameStore((s) => s.language)
+  const dailyMode = useGameStore((s) => s.dailyMode)
+  const exitToHub = useGameStore((s) => s.exitToHub)
 
   return (
     <div className="game-done">
@@ -18,9 +20,12 @@ export default function GameDone({
       <h2 className="game-done-title">{title}</h2>
       {scoreLabel ? <p className="game-done-score text-mono">{scoreLabel}</p> : null}
       {note ? <p className="game-done-note text-muted">{note}</p> : null}
+      {dailyMode ? (
+        <p className="game-done-note text-muted">{t(language, 'dailyLogged')}</p>
+      ) : null}
       <div className="game-done-actions">
-        <NeonButton onClick={onContinue} variant="green">
-          {t(language, 'continueArcade')}
+        <NeonButton onClick={dailyMode ? exitToHub : (onContinue || exitToHub)} variant="green">
+          {dailyMode ? t(language, 'dailyBackHome') : t(language, 'continueArcade')}
         </NeonButton>
         <NeonButton onClick={onPlayAgain} variant="outline" size="sm">
           {t(language, 'playAgainButton')}

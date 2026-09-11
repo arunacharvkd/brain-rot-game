@@ -124,7 +124,7 @@ export default function BreathFocus() {
             title={t(language, 'breathDone')}
             scoreLabel={t(language, 'scoreLabel').replace('{score}', score)}
             note={t(language, 'breathCompleted').replace('{count}', completedCycles)}
-            onContinue={() => setScreen('arcade')}
+            onContinue={() => useGameStore.getState().exitToHub()}
             onPlayAgain={() => {
               clearTimeout(navTimerRef.current)
               cancelAnimationFrame(rafRef.current)
@@ -145,7 +145,7 @@ export default function BreathFocus() {
                 {t(language, 'breathCycle').replace('{count}', completedCycles + 1).replace('{total}', TOTAL_PHASES / 2)} · {t(language, 'scoreLabel').replace('{score}', score)}
               </span>
               <button
-                onClick={() => setScreen('arcade')}
+                onClick={() => useGameStore.getState().exitToHub()}
                 style={{
                   background: 'none',
                   border: '1px solid rgba(255,255,255,0.15)',

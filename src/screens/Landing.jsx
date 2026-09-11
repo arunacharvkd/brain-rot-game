@@ -5,6 +5,7 @@ import NeonButton from '../components/NeonButton'
 import BrandMark, { BRC_LOGO_ALT, BRC_LOGO_COMPACT_SRC } from '../components/BrandMark'
 import PwaInstallCard from '../components/PwaInstallCard'
 import AdUnit from '../components/AdUnit'
+import DailyDrillCard from '../components/DailyDrillCard'
 import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
 import { AD_SLOTS } from '../data/ads'
 import { trackEvent } from '../lib/analytics'
@@ -43,7 +44,7 @@ export default function Landing() {
   const hasPriorScore = useGameStore((s) => s.quizScore > 0)
   const diagnosisDone = useGameStore((s) => s.diagnosisTier > 0 || s.quizScore > 0)
   const gameDone = useGameStore((s) => Object.keys(s.arcadeScores).length > 0)
-  const reset = useGameStore((s) => s.reset)
+  const resetProgress = useGameStore((s) => s.resetProgress)
   const language = useGameStore((s) => s.language)
   const setLanguage = useGameStore((s) => s.setLanguage)
   const muted = useGameStore((s) => s.muted)
@@ -210,6 +211,8 @@ export default function Landing() {
                   )}
                 </div>
 
+                <DailyDrillCard />
+
                 <div className="landing-subcta-row">
                   {diagnosisDone && !gameDone && (
                     <button onClick={() => setScreen('diagnosis')}>{t(language, 'viewDiagnosis')}</button>
@@ -223,7 +226,7 @@ export default function Landing() {
                   {hasPriorScore && (
                     <button className="landing-reset" onClick={() => {
                       trackEvent('progress_reset_clicked')
-                      reset()
+                      resetProgress()
                     }}>{t(language, 'resetProgress')}</button>
                   )}
                 </div>
