@@ -7,6 +7,7 @@ import AdUnit from '../components/AdUnit'
 import { AD_SLOTS } from '../data/ads'
 import { MIN_GAMES_FOR_RESULTS } from '../data/tiers'
 import { t } from '../i18n/translations'
+import DailyDrillCard from '../components/DailyDrillCard'
 
 export default function ArcadeHub() {
   const setScreen = useGameStore((s) => s.setScreen)
@@ -67,6 +68,8 @@ export default function ArcadeHub() {
             </NeonButton>
           </div>
         </motion.div>
+
+        <DailyDrillCard compact />
 
         {/* Game grid */}
         <div className="arcade-grid">

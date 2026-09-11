@@ -177,7 +177,7 @@ export default function PatternSimon() {
                 {t(language, 'scoreLabel').replace('{score}', score)}
               </span>
               <button
-                onClick={() => setScreen('arcade')}
+                onClick={() => useGameStore.getState().exitToHub()}
                 style={{
                   background: 'none',
                   border: '1px solid rgba(255,255,255,0.15)',
@@ -231,7 +231,7 @@ export default function PatternSimon() {
                       emoji={phase === 'done' ? '🏆' : '💡'}
                       title={phase === 'done' ? t(language, 'simonSequenceMaster') : t(language, 'simonReached').replace('{count}', displayRound)}
                       scoreLabel={t(language, 'memoryIntroScore').replace('{score}', score)}
-                      onContinue={() => setScreen('arcade')}
+                      onContinue={() => useGameStore.getState().exitToHub()}
                       onPlayAgain={handlePlayAgain}
                     />
                   </motion.div>

@@ -14,6 +14,9 @@ import { trackEvent, trackScreenView } from './lib/analytics'
 import { LANGUAGES } from './i18n/translations'
 import { getPathFromScreen, getScreenFromPath } from './lib/routes'
 import { ensureAdSenseScript, isAdSenseReady } from './data/ads'
+import { decodePayload } from './lib/codec'
+import ShareView from './screens/ShareView'
+import ChallengeBanner from './components/ChallengeBanner'
 
 const Game = lazy(() => import('./screens/Game'))
 const MemoryMatch = lazy(() => import('./screens/games/MemoryMatch'))
@@ -42,6 +45,7 @@ const SCREENS = {
   'game-order':   TapOrder,
   results:        FinalResults,
   privacy:        PrivacyPolicy,
+  shared:         ShareView,
 }
 
 export default function App() {
@@ -55,10 +59,14 @@ export default function App() {
   const toggleMute = useGameStore((s) => s.toggleMute)
   const language = useGameStore((s) => s.language)
   const setLanguage = useGameStore((s) => s.setLanguage)
+  const setSharedCard = useGameStore((s) => s.setSharedCard)
+  const acceptChallenge = useGameStore((s) => s.acceptChallenge)
+  const challenge = useGameStore((s) => s.challenge)
   const Screen = SCREENS[screen] ?? Landing
   const isGameScreen = screen === 'game' || screen.startsWith('game-')
   const isLandingScreen = screen === 'landing'
   const hasTrackedSessionRef = useRef(false)
+  const incomingLinkRef = useRef(false)
 
   useEffect(() => {
     if (hasTrackedSessionRef.current) return
@@ -86,8 +94,25 @@ export default function App() {
     if (isAdSenseReady()) ensureAdSenseScript()
   }, [])
 
+  useEffect(() => {
+    const applyIncoming = () => {
+      if (incomingLinkRef.current) return
+      const params = new URLSearchParams(window.location.search)
+      const payload = decodePayload(params.get('p'))
+      incomingLinkRef.current = true
+      if (!payload) return
+      setSharedCard(payload)
+      if (payload.k === 'c') acceptChallenge(payload)
+      else setScreen('shared')
+    }
+    const unsub = useGameStore.persist.onFinishHydration(applyIncoming)
+    if (useGameStore.persist.hasHydrated()) applyIncoming()
+    return unsub
+  }, [acceptChallenge, setScreen, setSharedCard])
+
   // Keep the URL in sync with the active screen so each screen is a distinct, crawlable page.
   useEffect(() => {
+    if (screen === 'shared') return
     const path = getPathFromScreen(screen)
     if (window.location.pathname !== path) {
       window.history.pushState({ screen }, '', path)
@@ -155,6 +180,9 @@ export default function App() {
             </button>
           </div>
         </>
+      )}
+      {challenge && !isLandingScreen && !isGameScreen && screen !== 'reaction' && screen !== 'results' && (
+        <ChallengeBanner />
       )}
       <Suspense fallback={<div className="screen screen-loading">Loading…</div>}>
         <AnimatePresence mode="wait">

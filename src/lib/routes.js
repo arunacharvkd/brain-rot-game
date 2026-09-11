@@ -27,5 +27,6 @@ export function getPathFromScreen(screen) {
 }
 
 export function getScreenFromPath(pathname) {
+  if (pathname === '/s') return 'shared'
   return PATH_TO_SCREEN[pathname] ?? 'landing'
 }
