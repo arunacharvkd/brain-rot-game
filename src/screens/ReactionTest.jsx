@@ -68,7 +68,9 @@ export default function ReactionTest() {
 
     const delay = 1000 + Math.random() * 2200
     waitTimerRef.current = setTimeout(() => {
-      setBrainPos({ x: 14 + Math.random() * 72, y: 12 + Math.random() * 72 })
+      // Keep the target fully inside the arena so overflow:hidden does not
+      // clip the emoji or its tap target on narrow phone widths.
+      setBrainPos({ x: 22 + Math.random() * 56, y: 22 + Math.random() * 56 })
       startRef.current = Date.now()
       setPhase('target')
       setDistractors([])
@@ -81,7 +83,9 @@ export default function ReactionTest() {
     }
   }, [phase])
 
-  const handleBrainClick = useCallback(() => {
+  const handleBrainClick = useCallback((e) => {
+    e?.preventDefault?.()
+    e?.stopPropagation?.()
     if (phase !== 'target') return
     const elapsed = Date.now() - startRef.current
     play('ding')
@@ -113,7 +117,7 @@ export default function ReactionTest() {
 
   return (
     <motion.div
-      className="screen"
+      className="screen reaction-screen"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -130,7 +134,7 @@ export default function ReactionTest() {
           </button>
         </div>
 
-        <div style={{ textAlign: 'center', marginBottom: 24 }}>
+        <div className="reaction-heading">
           <h2 style={{ fontSize: '1.3rem', fontWeight: 700, marginBottom: 6 }}>
             {t(language, 'reactionTitle')}
           </h2>
@@ -177,13 +181,15 @@ export default function ReactionTest() {
               <div
                 className="brain-target-wrap"
                 style={{ left: `${brainPos.x}%`, top: `${brainPos.y}%` }}
+                onPointerDown={handleBrainClick}
               >
                 <motion.button
                   key="brain"
+                  type="button"
                   className="brain-target"
                   onPointerDown={handleBrainClick}
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                  initial={{ scale: 0.72, opacity: 0.85 }}
+                  animate={{ scale: 1, opacity: 1 }}
                   transition={{ type: 'spring', stiffness: 400, damping: 14 }}
                   aria-label="Click the brain"
                 >
@@ -245,7 +251,7 @@ export default function ReactionTest() {
         </div>
 
         {/* CTA / times row */}
-        <div style={{ marginTop: 24, textAlign: 'center' }}>
+        <div className="reaction-cta">
           {phase === 'intro' && (
             <NeonButton onClick={() => {
               trackEvent('reaction_test_started', { rounds: TOTAL_ROUNDS })
