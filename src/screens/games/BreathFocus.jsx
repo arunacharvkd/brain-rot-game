@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
+import GameDone from '../../components/GameDone'
+import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
 
@@ -26,7 +28,12 @@ export default function BreathFocus() {
   const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
+  const scoreRef = useRef(0)
   const navTimerRef = useRef(null)
+
+  useEffect(() => {
+    scoreRef.current = score
+  }, [score])
 
   // Animate progress 0→1 within each phase using rAF
   useEffect(() => {
@@ -58,8 +65,7 @@ export default function BreathFocus() {
       setShowTap(false)
       if (phaseIndex + 1 >= TOTAL_PHASES) {
         setPhase('done')
-        setArcadeScore('breath', score)
-        navTimerRef.current = setTimeout(() => setScreen('arcade'), 2600)
+        setArcadeScore('breath', scoreRef.current)
       } else {
         setPhaseIndex((i) => i + 1)
         setCyclePhase((p) => (p === 'inhale' ? 'exhale' : 'inhale'))
@@ -102,6 +108,7 @@ export default function BreathFocus() {
       <GlassCard style={{ maxWidth: 440, width: '100%' }}>
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
+            <div className="game-intro-top"><ArcadeBack /></div>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>💨</div>
             <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'breathIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
@@ -112,37 +119,24 @@ export default function BreathFocus() {
             </NeonButton>
           </div>
         ) : phase === 'done' ? (
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: 12 }}>🌿</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 8 }}>{t(language, 'breathDone')}</h2>
-            <p className="text-mono" style={{ fontSize: '1.5rem', color: 'var(--green)', fontWeight: 700 }}>
-              {t(language, 'scoreLabel').replace('{score}', score)}
-            </p>
-            <p className="text-muted text-sm" style={{ marginTop: 8 }}>
-              {t(language, 'breathCompleted').replace('{count}', completedCycles)}
-            </p>
-            <button
-              onClick={() => {
-                clearTimeout(navTimerRef.current)
-                cancelAnimationFrame(rafRef.current)
-                setCyclePhase('inhale')
-                setPhaseIndex(0)
-                setShowTap(false)
-                setTapped(false)
-                setScore(0)
-                setProgress(0)
-                setPhase('intro')
-              }}
-              style={{
-                marginTop: 16, background: 'none',
-                border: '1px solid rgba(255,255,255,0.25)',
-                borderRadius: 8, color: '#fff', fontSize: '0.9rem',
-                padding: '6px 18px', cursor: 'pointer',
-              }}
-            >
-              ↩ Play Again
-            </button>
-          </div>
+          <GameDone
+            emoji="🌿"
+            title={t(language, 'breathDone')}
+            scoreLabel={t(language, 'scoreLabel').replace('{score}', score)}
+            note={t(language, 'breathCompleted').replace('{count}', completedCycles)}
+            onContinue={() => setScreen('arcade')}
+            onPlayAgain={() => {
+              clearTimeout(navTimerRef.current)
+              cancelAnimationFrame(rafRef.current)
+              setCyclePhase('inhale')
+              setPhaseIndex(0)
+              setShowTap(false)
+              setTapped(false)
+              setScore(0)
+              setProgress(0)
+              setPhase('intro')
+            }}
+          />
         ) : (
           <div style={{ textAlign: 'center' }}>
             {/* Cycle counter */}

@@ -3,7 +3,7 @@ import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
 import { t } from '../i18n/translations'
 
-const LAST_UPDATED = 'August 19, 2026'
+const LAST_UPDATED = 'September 11, 2026'
 
 export default function PrivacyPolicy() {
   const setScreen = useGameStore((s) => s.setScreen)
@@ -73,8 +73,15 @@ export default function PrivacyPolicy() {
         <section className="privacy-section">
           <h2>Google AdSense &amp; Advertising</h2>
           <p>
-            We use <strong>Google AdSense</strong> to display advertisements on this site. Google and
-            its partners may use cookies to serve ads based on your prior visits to this and other
+            We use <strong>Google AdSense</strong> to display labeled advertisements at natural
+            breaks in the experience (for example after the product overview on the home page,
+            after your diagnosis, at the bottom of the rehab arcade, and after you share results).
+            Ads are not shown during active mini-games, and they are not required to continue.
+          </p>
+          <p>
+            Ads load only when a valid AdSense publisher ID and slot ID are configured for this
+            site. We do not run fake ads, pop-unders, or forced click-throughs. Google and its
+            partners may use cookies to serve ads based on your prior visits to this and other
             websites (interest-based advertising).
           </p>
           <p>

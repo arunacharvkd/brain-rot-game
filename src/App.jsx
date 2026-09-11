@@ -1,27 +1,29 @@
 import { AnimatePresence } from 'framer-motion'
-import { useEffect, useRef } from 'react'
+import { lazy, Suspense, useEffect, useRef } from 'react'
 import useGameStore from './store/gameStore'
 import Landing from './screens/Landing'
 import Quiz from './screens/Quiz'
 import ReactionTest from './screens/ReactionTest'
 import Diagnosis from './screens/Diagnosis'
 import ArcadeHub from './screens/ArcadeHub'
-import Game from './screens/Game'
 import FinalResults from './screens/FinalResults'
 import PrivacyPolicy from './screens/PrivacyPolicy'
-import MemoryMatch from './screens/games/MemoryMatch'
-import PatternSimon from './screens/games/PatternSimon'
-import SpeedMath from './screens/games/SpeedMath'
-import BreathFocus from './screens/games/BreathFocus'
-import WordScramble from './screens/games/WordScramble'
-import ColourWord from './screens/games/ColourWord'
-import OddOneOut from './screens/games/OddOneOut'
-import TapOrder from './screens/games/TapOrder'
 import Footer from './components/Footer'
 import BrandMark from './components/BrandMark'
 import { trackEvent, trackScreenView } from './lib/analytics'
 import { LANGUAGES } from './i18n/translations'
 import { getPathFromScreen, getScreenFromPath } from './lib/routes'
+import { ensureAdSenseScript, isAdSenseReady } from './data/ads'
+
+const Game = lazy(() => import('./screens/Game'))
+const MemoryMatch = lazy(() => import('./screens/games/MemoryMatch'))
+const PatternSimon = lazy(() => import('./screens/games/PatternSimon'))
+const SpeedMath = lazy(() => import('./screens/games/SpeedMath'))
+const BreathFocus = lazy(() => import('./screens/games/BreathFocus'))
+const WordScramble = lazy(() => import('./screens/games/WordScramble'))
+const ColourWord = lazy(() => import('./screens/games/ColourWord'))
+const OddOneOut = lazy(() => import('./screens/games/OddOneOut'))
+const TapOrder = lazy(() => import('./screens/games/TapOrder'))
 
 const SCREENS = {
   landing:        Landing,
@@ -79,6 +81,10 @@ export default function App() {
   useEffect(() => {
     document.documentElement.lang = language
   }, [language])
+
+  useEffect(() => {
+    if (isAdSenseReady()) ensureAdSenseScript()
+  }, [])
 
   // Keep the URL in sync with the active screen so each screen is a distinct, crawlable page.
   useEffect(() => {
@@ -150,9 +156,11 @@ export default function App() {
           </div>
         </>
       )}
-      <AnimatePresence mode="wait">
-        <Screen key={screen} />
-      </AnimatePresence>
+      <Suspense fallback={<div className="screen screen-loading">Loading…</div>}>
+        <AnimatePresence mode="wait">
+          <Screen key={screen} />
+        </AnimatePresence>
+      </Suspense>
       {!isGameScreen && !isLandingScreen && <Footer />}
     </div>
   )

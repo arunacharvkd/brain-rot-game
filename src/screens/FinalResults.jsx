@@ -25,15 +25,18 @@ function getVerdict(before, after) {
   return 'Even this session is brain training! Play again — every round counts. 🧠'
 }
 
-function getShareText(before, after, totalScore, gamesPlayed) {
-  return [
+function getSharePayload(before, after, totalScore, gamesPlayed) {
+  const url = typeof window !== 'undefined' ? window.location.origin : 'https://brainrotchecker.com'
+  const text = [
     '🧠 Brain Rot Test Results',
     `Diagnosis: ${TIERS[before].emoji} ${TIERS[before].label}`,
     `After Rehab: ${TIERS[after].emoji} ${TIERS[after].label}`,
     `Total Score: ${totalScore} pts across ${gamesPlayed} game${gamesPlayed !== 1 ? 's' : ''}`,
     '',
-    'Are you cooked? Find out! 👆',
+    'Are you cooked? Find out:',
+    url,
   ].join('\n')
+  return { title: 'Brain Rot Test Results', text, url }
 }
 
 const fadeUp = (delay = 0) => ({
@@ -67,22 +70,31 @@ export default function FinalResults() {
       tier_improvement: Math.max(0, diagnosisTier - computed),
     })
     play('win')
-    confetti({ particleCount: 220, spread: 110, origin: { y: 0.58 } })
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    const mobile = window.innerWidth < 640
+    if (!reduceMotion) {
+      confetti({
+        particleCount: mobile ? 70 : 180,
+        spread: 100,
+        origin: { y: 0.35 },
+        disableForReducedMotion: true,
+      })
+    }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   const verdict = getVerdict(diagnosisTier, finalTier)
 
   const handleShare = async () => {
-    const text = getShareText(diagnosisTier, finalTier, totalScore, gamesPlayed)
+    const payload = getSharePayload(diagnosisTier, finalTier, totalScore, gamesPlayed)
     if (navigator.share) {
       try {
-        await navigator.share({ title: 'Brain Rot Test Results', text })
+        await navigator.share(payload)
         trackEvent('result_shared', { method: 'native_share' })
         return
       } catch {}
     }
     try {
-      await navigator.clipboard.writeText(text)
+      await navigator.clipboard.writeText(payload.text)
       trackEvent('result_shared', { method: 'clipboard' })
       setCopied(true)
       setTimeout(() => setCopied(false), 2400)
@@ -163,7 +175,7 @@ export default function FinalResults() {
           </NeonButton>
         </motion.div>
 
-        {/* AdSense: below Share/Play Again buttons */}
+        {/* AdSense after the share/play-again break */}
         <AdUnit slot={AD_SLOTS.results} className="results-ad" />
 
         {SPONSOR.active && (

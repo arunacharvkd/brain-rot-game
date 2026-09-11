@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
+import GameDone from '../../components/GameDone'
+import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
 
@@ -56,8 +58,7 @@ export default function MemoryMatch() {
     setPhase('done')
     play('win')
     setArcadeScore('memory', s)
-    navTimerRef.current = setTimeout(() => setScreen('arcade'), 2600)
-  }, [phase, timeLeft, play, setArcadeScore, setScreen])
+  }, [phase, timeLeft, play, setArcadeScore])
 
   const handlePlayAgain = () => {
     clearTimeout(navTimerRef.current)
@@ -114,6 +115,7 @@ export default function MemoryMatch() {
       <GlassCard style={{ maxWidth: 520, width: '100%' }}>
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
+            <div className="game-intro-top"><ArcadeBack /></div>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🃏</div>
             <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'memoryIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
@@ -176,24 +178,13 @@ export default function MemoryMatch() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <div style={{ fontSize: '2.5rem' }}>🎉</div>
-                    <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--green)' }}>
-                      {matchedCount === EMOJIS.length ? 'All Pairs Found!' : `${matchedCount} Pairs Found`}
-                    </div>
-                    <div className="text-mono" style={{ color: 'var(--text-muted)' }}>
-                      Score: {score} pts
-                    </div>
-                    <button
-                      onClick={handlePlayAgain}
-                      style={{
-                        marginTop: 12, background: 'none',
-                        border: '1px solid rgba(255,255,255,0.25)',
-                        borderRadius: 8, color: '#fff', fontSize: '0.85rem',
-                        padding: '5px 16px', cursor: 'pointer',
-                      }}
-                    >
-                      ↩ Play Again
-                    </button>
+                    <GameDone
+                      emoji="🎉"
+                      title={matchedCount === EMOJIS.length ? 'All Pairs Found!' : `${matchedCount} Pairs Found`}
+                      scoreLabel={`Score: ${score} pts`}
+                      onContinue={() => setScreen('arcade')}
+                      onPlayAgain={handlePlayAgain}
+                    />
                   </motion.div>
                 )}
               </AnimatePresence>

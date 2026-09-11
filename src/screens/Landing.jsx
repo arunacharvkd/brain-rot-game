@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
-import BrandMark, { BRC_LOGO_ALT, BRC_LOGO_SRC } from '../components/BrandMark'
+import BrandMark, { BRC_LOGO_ALT, BRC_LOGO_COMPACT_SRC } from '../components/BrandMark'
 import PwaInstallCard from '../components/PwaInstallCard'
 import AdUnit from '../components/AdUnit'
 import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
@@ -232,7 +232,7 @@ export default function Landing() {
               {/* Desktop brand lockup — hidden on mobile */}
               <div className="landing-visual-stack">
                 <div className="landing-logo-plate">
-                  <img src={BRC_LOGO_SRC} alt={BRC_LOGO_ALT} className="landing-visual-logo" />
+                  <img src={BRC_LOGO_COMPACT_SRC} alt={BRC_LOGO_ALT} className="landing-visual-logo" />
                 </div>
                 <div className="landing-metric-panel">
                   <div>
@@ -280,18 +280,6 @@ export default function Landing() {
           </div>
         </section>
 
-        <section className="landing-section">
-          <div className="landing-block">
-            <AdUnit slot={AD_SLOTS.landing} className="landing-hero-ad" />
-          </div>
-        </section>
-
-        {/* <section id="install" className="landing-section">
-          <div className="landing-block">
-            <PwaInstallCard />
-          </div>
-        </section> */}
-
         <section id="about" className="landing-section">
           <div className="landing-block">
             <h2>{t(language, 'productHeading')}</h2>
@@ -312,6 +300,12 @@ export default function Landing() {
             </div>
           </div>
         </section>
+
+        {AD_SLOTS.landing ? (
+          <section className="landing-section">
+            <AdUnit slot={AD_SLOTS.landing} className="landing-about-ad" />
+          </section>
+        ) : null}
 
         {(SPONSOR.active || activeSupportingSponsors.length > 0) && (
           <section id="sponsor" className="landing-section">

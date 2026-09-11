@@ -5,6 +5,7 @@ import NeonButton from '../components/NeonButton'
 import BrandMark from '../components/BrandMark'
 import AdUnit from '../components/AdUnit'
 import { AD_SLOTS } from '../data/ads'
+import { MIN_GAMES_FOR_RESULTS } from '../data/tiers'
 import { t } from '../i18n/translations'
 
 export default function ArcadeHub() {
@@ -50,10 +51,13 @@ export default function ArcadeHub() {
               {gamesPlayed === 0
                 ? t(language, 'arcadePickAnyGame')
                 : t(language, 'arcadePlayed').replace('{count}', gamesPlayed).replace('{total}', GAMES.length).replace('{score}', totalScore)}
+              {gamesPlayed > 0 && gamesPlayed < MIN_GAMES_FOR_RESULTS
+                ? ` · ${t(language, 'arcadeUnlockResults').replace('{count}', MIN_GAMES_FOR_RESULTS - gamesPlayed)}`
+                : ''}
             </p>
           </div>
           <div className="arcade-header-actions">
-            {gamesPlayed === GAMES.length && (
+            {gamesPlayed >= MIN_GAMES_FOR_RESULTS && (
               <NeonButton onClick={() => setScreen('results')} variant="green" size="sm">
                 {t(language, 'arcadeSeeResults')}
               </NeonButton>
@@ -111,8 +115,12 @@ export default function ArcadeHub() {
           })}
         </div>
 
-        {/* TODO: replace 'arcade-hub-mid' with real AdSense ad unit slot id once approved */}
         <AdUnit slot={AD_SLOTS.arcade} className="arcade-hub-ad" />
+        {gamesPlayed > 0 && gamesPlayed < MIN_GAMES_FOR_RESULTS && (
+          <p className="arcade-unlock-hint text-muted">
+            {t(language, 'arcadeUnlockResults').replace('{count}', MIN_GAMES_FOR_RESULTS - gamesPlayed)}
+          </p>
+        )}
       </div>
     </motion.div>
   )

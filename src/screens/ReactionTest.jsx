@@ -106,7 +106,7 @@ export default function ReactionTest() {
           reaction_score: reactionScore,
         })
         setPhase('complete')
-        setTimeout(() => setScreen('diagnosis'), 1600)
+        setTimeout(() => setScreen('diagnosis'), 900)
       }
     }, 900)
   }, [phase, times, roundIndex, play, setReactionScore, setScreen])
@@ -122,16 +122,9 @@ export default function ReactionTest() {
       <GlassCard style={{ maxWidth: 560, width: '100%' }}>
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 12 }}>
           <button
+            type="button"
+            className="ghost-back"
             onClick={() => setScreen('quiz')}
-            style={{
-              background: 'none',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: 7,
-              color: 'var(--text-muted)',
-              fontSize: '0.74rem',
-              padding: '4px 10px',
-              cursor: 'pointer',
-            }}
           >
             ← {t(language, 'backToQuiz')}
           </button>
@@ -181,18 +174,22 @@ export default function ReactionTest() {
             )}
 
             {phase === 'target' && (
-              <motion.button
-                key="brain"
-                className="brain-target"
+              <div
+                className="brain-target-wrap"
                 style={{ left: `${brainPos.x}%`, top: `${brainPos.y}%` }}
-                onClick={handleBrainClick}
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', stiffness: 400, damping: 14 }}
-                aria-label="Click the brain"
               >
-                🧠
-              </motion.button>
+                <motion.button
+                  key="brain"
+                  className="brain-target"
+                  onPointerDown={handleBrainClick}
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 14 }}
+                  aria-label="Click the brain"
+                >
+                  🧠
+                </motion.button>
+              </div>
             )}
 
             {phase === 'result' && lastMs && (

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
+import GameDone from '../../components/GameDone'
+import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
 
@@ -46,7 +48,6 @@ export default function TapOrder() {
       if (qIndex + 1 >= TOTAL) {
         setPhase('done')
         setArcadeScore('order', newScore)
-        navTimerRef.current = setTimeout(() => setScreen('arcade'), 2400)
       } else {
         setQIndex((i) => i + 1)
         setCells(makeRound())
@@ -113,6 +114,7 @@ export default function TapOrder() {
       <GlassCard style={{ maxWidth: 500, width: '100%' }}>
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
+            <div className="game-intro-top"><ArcadeBack /></div>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🔢</div>
             <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'orderIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 24, lineHeight: 1.6 }}>
@@ -123,24 +125,13 @@ export default function TapOrder() {
             </NeonButton>
           </div>
         ) : phase === 'done' ? (
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: 12 }}>🏁</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 8 }}>Great Sequence!</h2>
-            <p className="text-mono" style={{ fontSize: '1.5rem', color: 'var(--green)', fontWeight: 700 }}>
-              {score} pts
-            </p>
-            <button
-              onClick={handlePlayAgain}
-              style={{
-                marginTop: 16, background: 'none',
-                border: '1px solid rgba(255,255,255,0.25)',
-                borderRadius: 8, color: '#fff', fontSize: '0.9rem',
-                padding: '6px 18px', cursor: 'pointer',
-              }}
-            >
-              ↩ Play Again
-            </button>
-          </div>
+          <GameDone
+            emoji="🏁"
+            title="Great Sequence!"
+            scoreLabel={`${score} pts`}
+            onContinue={() => setScreen('arcade')}
+            onPlayAgain={handlePlayAgain}
+          />
         ) : (
           <>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14 }}>

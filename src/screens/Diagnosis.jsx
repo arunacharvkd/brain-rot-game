@@ -42,7 +42,7 @@ export default function Diagnosis() {
 
   return (
     <motion.div
-      className="screen"
+      className="screen diagnosis-screen"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -50,18 +50,7 @@ export default function Diagnosis() {
     >
       <GlassCard glow style={{ maxWidth: 480, width: '100%', textAlign: 'center' }}>
         <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 8 }}>
-          <button
-            onClick={() => setScreen('reaction')}
-            style={{
-              background: 'none',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: 7,
-              color: 'var(--text-muted)',
-              fontSize: '0.74rem',
-              padding: '4px 10px',
-              cursor: 'pointer',
-            }}
-          >
+          <button type="button" className="ghost-back" onClick={() => setScreen('reaction')}>
             ← {t(language, 'back')}
           </button>
         </div>
@@ -115,9 +104,8 @@ export default function Diagnosis() {
             </p>
           )}
         </motion.div>
-
-        <AdUnit slot={AD_SLOTS.diagnosis} />
       </GlassCard>
+      <AdUnit slot={AD_SLOTS.diagnosis} className="flow-ad" />
     </motion.div>
   )
 }

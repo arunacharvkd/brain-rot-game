@@ -67,18 +67,11 @@ export default function Quiz() {
       transition={{ duration: 0.32 }}
     >
       <GlassCard style={{ maxWidth: 560, width: '100%' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 12 }}>
+        <div className="quiz-toolbar">
           <button
+            type="button"
+            className="ghost-back"
             onClick={() => setScreen('landing')}
-            style={{
-              background: 'none',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: 7,
-              color: 'var(--text-muted)',
-              fontSize: '0.74rem',
-              padding: '4px 10px',
-              cursor: 'pointer',
-            }}
           >
             ← {t(language, 'back')}
           </button>
@@ -98,23 +91,7 @@ export default function Quiz() {
             className="text-mono"
           >
             <span>{t(language, 'question')} {qIndex + 1} / {questions.length}</span>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              <span>{t(language, 'quizTitle')}</span>
-              <button
-                onClick={() => setScreen('landing')}
-                style={{
-                  background: 'none',
-                  border: '1px solid rgba(255,255,255,0.15)',
-                  borderRadius: 6,
-                  color: 'var(--text-muted)',
-                  fontSize: '0.7rem',
-                  padding: '2px 8px',
-                  cursor: 'pointer',
-                }}
-              >
-                ✕ {t(language, 'exit')}
-              </button>
-            </div>
+            <span>{t(language, 'quizTitle')}</span>
           </div>
           <div className="progress-track">
             <div className="progress-fill" style={{ width: `${progressPct}%` }} />

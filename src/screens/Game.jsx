@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import confetti from 'canvas-confetti'
 import useGameStore from '../store/gameStore'
 import EmojiItem from '../components/EmojiItem'
+import GameDone from '../components/GameDone'
 import { useSound } from '../hooks/useSound'
 
 const GOOD = ['🧠', '📚', '💧', '🍎', '😴']
@@ -80,10 +81,16 @@ export default function Game() {
     if (roundPhase !== 'done') return
     const final = scoreRef.current
     play('win')
-    confetti({ particleCount: 200, spread: 100, origin: { y: 0.55 } })
+    const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
+    if (!reduceMotion) {
+      confetti({
+        particleCount: window.innerWidth < 640 ? 60 : 140,
+        spread: 90,
+        origin: { y: 0.45 },
+        disableForReducedMotion: true,
+      })
+    }
     setArcadeScore('focus', final)
-    const t = setTimeout(() => setScreen('arcade'), 2600)
-    return () => clearTimeout(t)
   }, [roundPhase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleHit = useCallback(
@@ -207,28 +214,25 @@ export default function Game() {
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 0.1 }}
             >
-              {roundPhase === 'done' ? '🎉 REHAB COMPLETE' : `Round ${round} Done!`}
+              {roundPhase === 'done' ? null : `Round ${round} Done!`}
             </motion.div>
-            <div className="round-overlay-score text-mono">
-              Score: {score} pts
-            </div>
+            {roundPhase !== 'done' && (
+              <div className="round-overlay-score text-mono">
+                Score: {score} pts
+              </div>
+            )}
             {roundPhase === 'summary' && (
               <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: 8 }}>
                 Next round starting...
               </div>
             )}
             {roundPhase === 'done' && (
-              <button
-                onClick={handlePlayAgain}
-                style={{
-                  marginTop: 14, background: 'none',
-                  border: '1px solid rgba(255,255,255,0.25)',
-                  borderRadius: 8, color: '#fff', fontSize: '0.9rem',
-                  padding: '6px 18px', cursor: 'pointer',
-                }}
-              >
-                ↩ Play Again
-              </button>
+              <GameDone
+                title="🎉 REHAB COMPLETE"
+                scoreLabel={`Score: ${score} pts`}
+                onContinue={() => setScreen('arcade')}
+                onPlayAgain={handlePlayAgain}
+              />
             )}
           </motion.div>
         )}
