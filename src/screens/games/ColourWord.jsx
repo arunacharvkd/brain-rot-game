@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
+import GameDone from '../../components/GameDone'
+import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
 
@@ -52,7 +54,6 @@ export default function ColourWord() {
       if (qIndex + 1 >= TOTAL) {
         setPhase('done')
         setArcadeScore('colour', newScore)
-        navTimerRef.current = setTimeout(() => setScreen('arcade'), 2400)
       } else {
         setRound(makeRound())
         setQIndex((i) => i + 1)
@@ -108,6 +109,7 @@ export default function ColourWord() {
       <GlassCard style={{ maxWidth: 460, width: '100%' }}>
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
+            <div className="game-intro-top"><ArcadeBack /></div>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🎨</div>
             <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'colourIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 16, lineHeight: 1.6 }}>
@@ -122,24 +124,13 @@ export default function ColourWord() {
             </NeonButton>
           </div>
         ) : phase === 'done' ? (
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: 12 }}>🎨</div>
-            <h2 style={{ fontWeight: 800, marginBottom: 8 }}>Colour Expert!</h2>
-            <p className="text-mono" style={{ fontSize: '1.5rem', color: 'var(--green)', fontWeight: 700 }}>
-              {score} / {TOTAL * 10} pts
-            </p>
-            <button
-              onClick={handlePlayAgain}
-              style={{
-                marginTop: 16, background: 'none',
-                border: '1px solid rgba(255,255,255,0.25)',
-                borderRadius: 8, color: '#fff', fontSize: '0.9rem',
-                padding: '6px 18px', cursor: 'pointer',
-              }}
-            >
-              ↩ Play Again
-            </button>
-          </div>
+          <GameDone
+            emoji="🎨"
+            title="Colour Expert!"
+            scoreLabel={`${score} / ${TOTAL * 10} pts`}
+            onContinue={() => setScreen('arcade')}
+            onPlayAgain={handlePlayAgain}
+          />
         ) : (
           <>
             {/* HUD */}

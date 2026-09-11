@@ -175,7 +175,7 @@ export function getQuestions(language) {
   return QUESTIONS.map((question, index) => ({
     ...question,
     text: translations[index] ?? question.text,
-    options: (optionTranslations?.[index] ?? question.options).map((option, optionIndex) => ({
+    options: question.options.map((option, optionIndex) => ({
       ...option,
       text: optionTranslations?.[index]?.[optionIndex] ?? option.text,
     })),

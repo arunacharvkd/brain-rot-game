@@ -1,33 +1,43 @@
 import { useEffect, useRef } from 'react'
-
-const AD_CLIENT = 'ca-pub-2337245858816005'
+import { ADSENSE_CLIENT, ensureAdSenseScript, isAdSenseReady, isRealAdSlot } from '../data/ads'
 
 export default function AdUnit({ slot, width = 320, height = 100, className = '' }) {
   const pushed = useRef(false)
-  // Real AdSense slot IDs are numeric; anything else is a placeholder awaiting approval.
-  const isRealSlot = /^\d+$/.test(String(slot))
+  const ready = isAdSenseReady() && isRealAdSlot(slot)
 
   useEffect(() => {
-    if (!isRealSlot || pushed.current) return
-    pushed.current = true
-    try {
-      ;(window.adsbygoogle = window.adsbygoogle || []).push({})
-    } catch {}
-  }, [isRealSlot])
+    if (!ready) return
+    let cancelled = false
 
-  if (!isRealSlot) {
-    return <div className={`ad-unit ad-unit--placeholder ${className}`} aria-hidden="true" />
-  }
+    ensureAdSenseScript()?.then(() => {
+      if (cancelled || pushed.current) return
+      pushed.current = true
+      try {
+        ;(window.adsbygoogle = window.adsbygoogle || []).push({})
+      } catch {
+        /* AdSense may throw if the slot is already filled */
+      }
+    })
+
+    return () => {
+      cancelled = true
+    }
+  }, [ready, slot])
+
+  if (!ready) return null
 
   return (
-    <div className={`ad-unit ${className}`}>
-      {/* Fixed size (not data-ad-format="auto"): responsive ads make Google's script force ancestors to height:auto, breaking our fixed-viewport app shell. */}
-      <ins
-        className="adsbygoogle"
-        style={{ display: 'inline-block', width: `${width}px`, height: `${height}px` }}
-        data-ad-client={AD_CLIENT}
-        data-ad-slot={slot}
-      />
-    </div>
+    <aside className={`ad-break ${className}`.trim()} aria-label="Advertisement">
+      <p className="ad-break-label">Advertisement</p>
+      <div className="ad-unit">
+        {/* Fixed size (not data-ad-format="auto"): responsive ads make Google's script force ancestors to height:auto. */}
+        <ins
+          className="adsbygoogle"
+          style={{ display: 'inline-block', width: `${width}px`, height: `${height}px` }}
+          data-ad-client={ADSENSE_CLIENT}
+          data-ad-slot={slot}
+        />
+      </div>
+    </aside>
   )
 }

@@ -3,6 +3,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../../store/gameStore'
 import GlassCard from '../../components/GlassCard'
 import NeonButton from '../../components/NeonButton'
+import GameDone from '../../components/GameDone'
+import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
 
@@ -102,7 +104,6 @@ export default function PatternSimon() {
       play('buzz')
       setPhase('wrong')
       setArcadeScore('simon', score)
-      navTimerRef.current = setTimeout(() => setScreen('arcade'), 2400)
       return
     }
 
@@ -115,7 +116,6 @@ export default function PatternSimon() {
         // Game complete
         setPhase('done')
         setArcadeScore('simon', newScore)
-        navTimerRef.current = setTimeout(() => setScreen('arcade'), 2400)
       } else {
         setPhase('win_round')
         setTimeout(() => startRound(sequence), 900)
@@ -159,6 +159,7 @@ export default function PatternSimon() {
       <GlassCard style={{ maxWidth: 460, width: '100%' }}>
         {phase === 'intro' ? (
           <div style={{ textAlign: 'center' }}>
+            <div className="game-intro-top"><ArcadeBack /></div>
             <div style={{ fontSize: '3rem', marginBottom: 12 }}>🟥</div>
             <h2 style={{ fontWeight: 800, marginBottom: 10 }}>{t(language, 'simonIntroTitle')}</h2>
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
@@ -226,22 +227,13 @@ export default function PatternSimon() {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                   >
-                    <div style={{ fontSize: '2rem' }}>{phase === 'done' ? '🏆' : '💡'}</div>
-                    <div style={{ fontSize: '1.3rem', fontWeight: 800, color: phase === 'done' ? 'var(--green)' : 'var(--yellow)' }}>
-                      {phase === 'done' ? t(language, 'simonSequenceMaster') : t(language, 'simonReached').replace('{count}', displayRound)}
-                    </div>
-                    <div className="text-mono text-muted text-sm">{t(language, 'memoryIntroScore').replace('{score}', score)}</div>
-                    <button
-                      onClick={handlePlayAgain}
-                      style={{
-                        marginTop: 12, background: 'none',
-                        border: '1px solid rgba(255,255,255,0.25)',
-                        borderRadius: 8, color: '#fff', fontSize: '0.85rem',
-                        padding: '5px 16px', cursor: 'pointer',
-                      }}
-                    >
-                      ↩ Play Again
-                    </button>
+                    <GameDone
+                      emoji={phase === 'done' ? '🏆' : '💡'}
+                      title={phase === 'done' ? t(language, 'simonSequenceMaster') : t(language, 'simonReached').replace('{count}', displayRound)}
+                      scoreLabel={t(language, 'memoryIntroScore').replace('{score}', score)}
+                      onContinue={() => setScreen('arcade')}
+                      onPlayAgain={handlePlayAgain}
+                    />
                   </motion.div>
                 </AnimatePresence>
               )}

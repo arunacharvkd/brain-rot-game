@@ -147,14 +147,32 @@ a { color: inherit; text-decoration: none; }
 /* ── Ad units ──────────────────────────────────────────── */
 .ad-unit {
   width: 100%;
-  min-height: 90px;
+  min-height: 0;
   max-height: 280px;
-  margin-top: 20px;
   border-radius: var(--r-md);
   overflow: hidden;
   display: flex;
   justify-content: center;
 }
+.ad-break {
+  width: 100%;
+  max-width: 540px;
+  margin: 18px auto 8px;
+  padding: 10px 12px 12px;
+  border: 1px dashed rgba(255,255,255,0.14);
+  border-radius: var(--r-md);
+  background: rgba(255,255,255,0.03);
+}
+.ad-break-label {
+  font-size: 0.68rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  text-align: center;
+  margin-bottom: 8px;
+}
+.flow-ad { margin-top: 16px; }
+.arcade-hub-ad { max-width: none; }
 .ad-unit--arcade {
   margin-top: 28px;
   margin-bottom: 8px;
@@ -370,18 +388,20 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
   cursor: crosshair;
 }
-.brain-target {
+.brain-target-wrap {
   position: absolute;
-  font-size: 3.8rem;
   transform: translate(-50%, -50%);
+  z-index: 2;
+}
+.brain-target {
+  font-size: 3.8rem;
+  line-height: 1;
+  min-width: 64px;
+  min-height: 64px;
   cursor: pointer;
   user-select: none;
+  touch-action: manipulation;
   filter: drop-shadow(0 0 18px rgba(46, 204, 150, 0.85));
-  animation: targetPop 0.2s ease;
-}
-@keyframes targetPop {
-  from { transform: translate(-50%, -50%) scale(0.2); }
-  to   { transform: translate(-50%, -50%) scale(1); }
 }
 .distractor-emoji {
   position: absolute;
@@ -547,6 +567,8 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Final Results ─────────────────────────────────────── */
 .results-title {
+  position: relative;
+  z-index: 2;
   font-size: 1.7rem;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -1902,6 +1924,59 @@ a { color: inherit; text-decoration: none; }
   text-underline-offset: 3px;
 }
 .privacy-section a:hover { color: var(--text); }
+
+.game-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 8px;
+  padding: 8px 4px;
+}
+.game-done-emoji { font-size: 2.6rem; line-height: 1; }
+.game-done-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text);
+}
+.game-done-score {
+  font-size: 1.15rem;
+  color: var(--green);
+  font-weight: 700;
+}
+.game-done-note { font-size: 0.85rem; }
+.game-done-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 12px;
+}
+.game-intro-top {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 12px;
+}
+.quiz-toolbar { margin-bottom: 12px; }
+.diagnosis-screen {
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 4px;
+}
+.arcade-unlock-hint {
+  text-align: center;
+  font-size: 0.82rem;
+  margin-top: 12px;
+}
+.screen-loading {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+@media (max-width: 560px) {
+  .reaction-arena { height: 300px; }
+  .memory-grid { gap: 8px; }
+}
 
 /* ── Utilities ─────────────────────────────────────────── */
 .text-mono { font-family: 'JetBrains Mono', monospace; }
