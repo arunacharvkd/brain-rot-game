@@ -5,6 +5,7 @@ import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import BrainRotMeter from '../components/BrainRotMeter'
 import NeonButton from '../components/NeonButton'
+import BrandMark from '../components/BrandMark'
 import AdUnit from '../components/AdUnit'
 import { TIERS, calcFinalTier, SPONSOR } from '../data/tiers'
 import { AD_SLOTS } from '../data/ads'
@@ -98,19 +99,13 @@ export default function FinalResults() {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.32 }}
     >
-      <GlassCard glow style={{ maxWidth: 540, width: '100%', textAlign: 'center' }}>
-        <div style={{ display: 'flex', justifyContent: 'flex-start', marginBottom: 8 }}>
+      <GlassCard glow className="results-card" style={{ maxWidth: 540, width: '100%', textAlign: 'center' }}>
+        <div className="results-toprow">
+          <BrandMark size={40} />
           <button
+            type="button"
+            className="ghost-back"
             onClick={() => setScreen('arcade')}
-            style={{
-              background: 'none',
-              border: '1px solid rgba(255,255,255,0.15)',
-              borderRadius: 7,
-              color: 'var(--text-muted)',
-              fontSize: '0.74rem',
-              padding: '4px 10px',
-              cursor: 'pointer',
-            }}
           >
             {t(language, 'backToArcade')}
           </button>

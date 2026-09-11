@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
+import BrandMark, { BRC_LOGO_ALT, BRC_LOGO_SRC } from '../components/BrandMark'
 import PwaInstallCard from '../components/PwaInstallCard'
 import AdUnit from '../components/AdUnit'
 import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
@@ -68,13 +69,13 @@ export default function Landing() {
 
         {/* ── Topbar ── */}
         <motion.div className="landing-topbar" {...fadeUp(0.06)}>
-          <div className="landing-brand-wrap">
-            <img src="/ta-logo.svg" alt="TA logo" className="landing-brand-logo" />
+          <button type="button" className="landing-brand-wrap" onClick={() => scrollTo('home')}>
+            <BrandMark size={44} className="landing-brand-logo" />
             <div>
               <div className="landing-brand">BrainRotChecker</div>
-              <div className="landing-brand-sub">focus diagnostics + rehab arcade</div>
+              <div className="landing-brand-sub">Test. Train. Transform.</div>
             </div>
-          </div>
+          </button>
 
           {/* Desktop nav */}
           <div className="landing-nav-desktop">
@@ -228,18 +229,11 @@ export default function Landing() {
                 </div>
               </div>
 
-              {/* Desktop image stack — hidden on mobile */}
+              {/* Desktop brand lockup — hidden on mobile */}
               <div className="landing-visual-stack">
-                <img
-                  src="https://images.unsplash.com/photo-1484480974693-6ca0a78fb36b?auto=format&fit=crop&w=1200&q=80"
-                  alt="Desk setup with notebook and planning"
-                  className="landing-visual-main"
-                />
-                <img
-                  src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=900&q=80"
-                  alt="Focused workspace and productivity planning"
-                  className="landing-visual-float"
-                />
+                <div className="landing-logo-plate">
+                  <img src={BRC_LOGO_SRC} alt={BRC_LOGO_ALT} className="landing-visual-logo" />
+                </div>
                 <div className="landing-metric-panel">
                   <div>
                     <strong>9</strong>
@@ -409,7 +403,10 @@ export default function Landing() {
         </section>
 
         <footer className="landing-page-footer">
-          <span>© 2026 Brain Rot Checker · {t(language, 'footerNote')}</span>
+          <div className="landing-page-footer-brand">
+            <BrandMark size={32} />
+            <span>© 2026 Brain Rot Checker · {t(language, 'footerNote')}</span>
+          </div>
           <div className="landing-page-footer-links">
             <button onClick={() => setScreen('privacy')}>{t(language, 'privacyPolicy')}</button>
             <a href="mailto:vkdarunacharya@gmail.com">{t(language, 'contact')}</a>

@@ -18,6 +18,7 @@ import ColourWord from './screens/games/ColourWord'
 import OddOneOut from './screens/games/OddOneOut'
 import TapOrder from './screens/games/TapOrder'
 import Footer from './components/Footer'
+import BrandMark from './components/BrandMark'
 import { trackEvent, trackScreenView } from './lib/analytics'
 import { LANGUAGES } from './i18n/translations'
 import { getPathFromScreen, getScreenFromPath } from './lib/routes'
@@ -120,21 +121,34 @@ export default function App() {
         </>
       )}
       {!isLandingScreen && (
-        <div className="app-controls">
-          <label className="language-picker">
-            <span className="sr-only">Language</span>
-            <select value={language} onChange={(event) => setLanguage(event.target.value)}>
-              {LANGUAGES.map(({ code, label }) => <option key={code} value={code}>{label}</option>)}
-            </select>
-          </label>
-          <button
-            onClick={toggleMute}
-            title={muted ? 'Unmute' : 'Mute'}
-            className="sound-toggle"
-          >
-            {muted ? '🔇' : '🔊'}
-          </button>
-        </div>
+        <>
+          {!isGameScreen && (
+            <button
+              type="button"
+              className="app-brand"
+              onClick={() => setScreen('landing')}
+              aria-label="BRC home"
+              title="BRC home"
+            >
+              <BrandMark size={40} />
+            </button>
+          )}
+          <div className="app-controls">
+            <label className="language-picker">
+              <span className="sr-only">Language</span>
+              <select value={language} onChange={(event) => setLanguage(event.target.value)}>
+                {LANGUAGES.map(({ code, label }) => <option key={code} value={code}>{label}</option>)}
+              </select>
+            </label>
+            <button
+              onClick={toggleMute}
+              title={muted ? 'Unmute' : 'Mute'}
+              className="sound-toggle"
+            >
+              {muted ? '🔇' : '🔊'}
+            </button>
+          </div>
+        </>
       )}
       <AnimatePresence mode="wait">
         <Screen key={screen} />

@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import useGameStore from '../store/gameStore'
 import GlassCard from '../components/GlassCard'
 import NeonButton from '../components/NeonButton'
+import BrandMark from '../components/BrandMark'
 import AdUnit from '../components/AdUnit'
 import { AD_SLOTS } from '../data/ads'
 import { t } from '../i18n/translations'
@@ -26,39 +27,32 @@ export default function ArcadeHub() {
 
   return (
     <motion.div
-      className="screen"
-      style={{ alignItems: 'flex-start', padding: '20px 20px 40px' }}
+      className="screen arcade-screen"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
     >
-      <div style={{ width: '100%', maxWidth: 740, margin: '0 auto' }}>
-        {/* Header */}
+      <div className="arcade-shell">
         <motion.div
-          style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            marginBottom: 24,
-            flexWrap: 'wrap',
-            gap: 12,
-          }}
+          className="arcade-header"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.38 }}
         >
-          <div>
-            <h1 style={{ fontSize: 'clamp(1.5rem, 5vw, 2rem)', fontWeight: 800 }}>
-              🧠 {t(language, 'arcadeTitle')}
-            </h1>
-            <p className="text-muted text-sm" style={{ marginTop: 4 }}>
+          <div className="arcade-header-copy">
+            <div className="arcade-kicker">
+              <BrandMark size={36} />
+              <span>Test. Train. Transform.</span>
+            </div>
+            <h1 className="arcade-title">{t(language, 'arcadeTitle')}</h1>
+            <p className="text-muted text-sm arcade-subtitle">
               {gamesPlayed === 0
                 ? t(language, 'arcadePickAnyGame')
                 : t(language, 'arcadePlayed').replace('{count}', gamesPlayed).replace('{total}', GAMES.length).replace('{score}', totalScore)}
             </p>
           </div>
-          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          <div className="arcade-header-actions">
             {gamesPlayed === GAMES.length && (
               <NeonButton onClick={() => setScreen('results')} variant="green" size="sm">
                 {t(language, 'arcadeSeeResults')}
