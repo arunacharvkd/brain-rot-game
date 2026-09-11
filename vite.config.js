@@ -68,7 +68,7 @@ export default defineConfig(({ mode }) => {
       feedbackApiDevPlugin(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['favicon.svg', 'apple-touch-icon.svg'],
+        includeAssets: ['favicon-64.png', 'apple-touch-icon.png', 'brc-logo.jpg', 'brc-logo-sm.jpg'],
         workbox: {
           cleanupOutdatedCaches: true,
           clientsClaim: true,
@@ -134,23 +134,23 @@ export default defineConfig(({ mode }) => {
           name: 'BrainRotChecker',
           short_name: 'BrainRot',
           description: 'Train your focus with a diagnosis + rehab arcade experience.',
-          theme_color: '#05060f',
-          background_color: '#05060f',
+          theme_color: '#0B1224',
+          background_color: '#0B1224',
           display: 'standalone',
           orientation: 'portrait',
           start_url: '/',
           scope: '/',
           icons: [
             {
-              src: '/pwa-192.svg',
+              src: '/pwa-192.png',
               sizes: '192x192',
-              type: 'image/svg+xml',
+              type: 'image/png',
               purpose: 'any',
             },
             {
-              src: '/pwa-512.svg',
+              src: '/pwa-512.png',
               sizes: '512x512',
-              type: 'image/svg+xml',
+              type: 'image/png',
               purpose: 'any maskable',
             },
           ],
