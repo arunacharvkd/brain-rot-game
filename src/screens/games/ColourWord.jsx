@@ -7,6 +7,8 @@ import GameDone from '../../components/GameDone'
 import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
+import { arcadeScore, runSummaryCopy } from '../../lib/scoring'
+import { usePlayClock } from '../../hooks/usePlayClock'
 
 const COLOURS = [
   { name: 'RED',    value: '#ef4444' },
@@ -35,25 +37,33 @@ export default function ColourWord() {
   const [score, setScore] = useState(0)
   const [feedback, setFeedback] = useState(null) // null | colourName
   const [locked, setLocked] = useState(false)
+  const [run, setRun] = useState(null)
   const { play } = useSound()
   const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
+  const clock = usePlayClock()
+  const correctRef = useRef(0)
 
   const advance = useCallback((chosen) => {
     if (locked) return
     setLocked(true)
     const correct = chosen === round.inkColour.name
-    const newScore = score + (correct ? 10 : 0)
+    const nextCorrect = correctRef.current + (correct ? 1 : 0)
+    correctRef.current = nextCorrect
     if (correct) play('ding'); else play('buzz')
     setFeedback(chosen)
-    setScore(newScore)
+    setScore(arcadeScore({ id: 'colour', accuracy: nextCorrect, elapsedMs: clock.elapsed() }).total)
 
     setTimeout(() => {
       if (qIndex + 1 >= TOTAL) {
+        const elapsed = clock.elapsed()
+        const result = arcadeScore({ id: 'colour', accuracy: nextCorrect, elapsedMs: elapsed })
+        setRun(result)
+        setScore(result.total)
         setPhase('done')
-        setArcadeScore('colour', newScore)
+        setArcadeScore('colour', result.total, elapsed)
       } else {
         setRound(makeRound())
         setQIndex((i) => i + 1)
@@ -62,7 +72,7 @@ export default function ColourWord() {
         setLocked(false)
       }
     }, 620)
-  }, [locked, score, qIndex, round, play, setArcadeScore, setScreen])
+  }, [locked, qIndex, round, play, setArcadeScore, clock])
 
   const handlePlayAgain = () => {
     clearTimeout(navTimerRef.current)
@@ -71,6 +81,8 @@ export default function ColourWord() {
     setQIndex(0)
     setTimeLeft(Q_TIME)
     setScore(0)
+    correctRef.current = 0
+    setRun(null)
     setFeedback(null)
     setLocked(false)
   }
@@ -119,7 +131,7 @@ export default function ColourWord() {
               <span style={{ fontSize: '2rem', fontWeight: 800, color: '#3b82f6' }}>RED</span>
               <p className="text-xs text-muted" style={{ marginTop: 4 }}>{t(language, 'colourExample')}</p>
             </div>
-            <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
+            <NeonButton onClick={() => { clock.start(); setPhase('playing') }} variant="purple" style={{ width: '100%' }}>
               {t(language, 'startButton')}
             </NeonButton>
           </div>
@@ -127,7 +139,9 @@ export default function ColourWord() {
           <GameDone
             emoji="🎨"
             title="Colour Expert!"
-            scoreLabel={`${score} / ${TOTAL * 10} pts`}
+            scoreLabel={run ? runSummaryCopy(t, language, run).scoreLabel : `${score} pts`}
+            timeLabel={run ? runSummaryCopy(t, language, run).timeLabel : undefined}
+            breakdown={run ? runSummaryCopy(t, language, run).breakdown : undefined}
             onContinue={() => useGameStore.getState().exitToHub()}
             onPlayAgain={handlePlayAgain}
           />

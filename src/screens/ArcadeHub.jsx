@@ -7,6 +7,7 @@ import AdUnit from '../components/AdUnit'
 import { AD_SLOTS } from '../data/ads'
 import { MIN_GAMES_FOR_RESULTS } from '../data/tiers'
 import { t } from '../i18n/translations'
+import { formatDuration, sumArcadeScores } from '../lib/scoring'
 import DailyDrillCard from '../components/DailyDrillCard'
 import DailyReminderCard from '../components/DailyReminderCard'
 import DailyNudge from '../components/DailyNudge'
@@ -14,9 +15,10 @@ import DailyNudge from '../components/DailyNudge'
 export default function ArcadeHub() {
   const setScreen = useGameStore((s) => s.setScreen)
   const arcadeScores = useGameStore((s) => s.arcadeScores)
+  const arcadeTimes = useGameStore((s) => s.arcadeTimes)
   const language = useGameStore((s) => s.language)
   const gamesPlayed = Object.keys(arcadeScores).length
-  const totalScore = Object.values(arcadeScores).reduce((a, b) => a + b, 0)
+  const totalScore = sumArcadeScores(arcadeScores)
   const GAMES = [
     { id: 'focus',  emoji: '🎯', name: t(language, 'gameFocus'), desc: t(language, 'gameFocusDesc'), screen: 'game' },
     { id: 'memory', emoji: '🃏', name: t(language, 'gameMemory'), desc: t(language, 'gameMemoryDesc'), screen: 'game-memory' },
@@ -80,6 +82,7 @@ export default function ArcadeHub() {
           {GAMES.map((game, i) => {
             const score = arcadeScores[game.id]
             const played = score !== undefined
+            const timeMs = arcadeTimes?.[game.id]
             return (
               <motion.div
                 key={game.id}
@@ -97,7 +100,9 @@ export default function ArcadeHub() {
                       <span style={{ fontSize: '2rem', lineHeight: 1 }}>{game.emoji}</span>
                       {played && (
                         <span className="tier-chip tier-0" style={{ fontSize: '0.7rem' }}>
-                          {t(language, 'bestScore').replace('{score}', score)}
+                          {timeMs
+                            ? t(language, 'bestScoreTime').replace('{score}', score).replace('{time}', formatDuration(timeMs))
+                            : t(language, 'bestScore').replace('{score}', score)}
                         </span>
                       )}
                     </div>

@@ -47,11 +47,11 @@ export function scoreToTier(total) {
 export const MIN_GAMES_FOR_RESULTS = 3
 
 export function calcFinalTier(diagnosisTier, arcadeScores) {
-  const scores = Object.values(arcadeScores)
+  const scores = Object.values(arcadeScores).map((n) => Number(n) || 0)
   const gamesPlayed = scores.length
-  const total = scores.reduce((a, b) => a + b, 0)
   if (gamesPlayed < MIN_GAMES_FOR_RESULTS) return diagnosisTier
-  const improvement = total >= 160 && gamesPlayed >= 6 ? 2 : total >= 48 ? 1 : 0
+  const mean = scores.reduce((a, b) => a + b, 0) / gamesPlayed
+  const improvement = gamesPlayed >= 6 && mean >= 65 ? 2 : mean >= 40 ? 1 : 0
   return Math.max(0, diagnosisTier - improvement)
 }
 

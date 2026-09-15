@@ -7,6 +7,8 @@ import GameDone from '../../components/GameDone'
 import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
+import { arcadeScore, runSummaryCopy } from '../../lib/scoring'
+import { usePlayClock } from '../../hooks/usePlayClock'
 
 // 8 cycles: inhale 4s → exhale 4s, "tap" prompt fires at each phase transition
 const TOTAL_PHASES = 8
@@ -30,6 +32,8 @@ export default function BreathFocus() {
   const setScreen = useGameStore((s) => s.setScreen)
   const scoreRef = useRef(0)
   const navTimerRef = useRef(null)
+  const clock = usePlayClock()
+  const [run, setRun] = useState(null)
 
   useEffect(() => {
     scoreRef.current = score
@@ -64,8 +68,12 @@ export default function BreathFocus() {
     const nextTimer = setTimeout(() => {
       setShowTap(false)
       if (phaseIndex + 1 >= TOTAL_PHASES) {
+        const elapsed = clock.elapsed()
+        const result = arcadeScore({ id: 'breath', accuracy: scoreRef.current, elapsedMs: elapsed })
+        setRun(result)
+        setScore(result.total)
         setPhase('done')
-        setArcadeScore('breath', scoreRef.current)
+        setArcadeScore('breath', result.total, elapsed)
       } else {
         setPhaseIndex((i) => i + 1)
         setCyclePhase((p) => (p === 'inhale' ? 'exhale' : 'inhale'))
@@ -114,7 +122,7 @@ export default function BreathFocus() {
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
               {t(language, 'breathIntroText')}
             </p>
-            <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
+            <NeonButton onClick={() => { clock.start(); setPhase('playing') }} variant="purple" style={{ width: '100%' }}>
               {t(language, 'breathIntroBegin')}
             </NeonButton>
           </div>
@@ -122,7 +130,9 @@ export default function BreathFocus() {
           <GameDone
             emoji="🌿"
             title={t(language, 'breathDone')}
-            scoreLabel={t(language, 'scoreLabel').replace('{score}', score)}
+            scoreLabel={run ? runSummaryCopy(t, language, run).scoreLabel : t(language, 'scoreLabel').replace('{score}', score)}
+            timeLabel={run ? runSummaryCopy(t, language, run).timeLabel : undefined}
+            breakdown={run ? runSummaryCopy(t, language, run).breakdown : undefined}
             note={t(language, 'breathCompleted').replace('{count}', completedCycles)}
             onContinue={() => useGameStore.getState().exitToHub()}
             onPlayAgain={() => {
@@ -133,6 +143,7 @@ export default function BreathFocus() {
               setShowTap(false)
               setTapped(false)
               setScore(0)
+              setRun(null)
               setProgress(0)
               setPhase('intro')
             }}

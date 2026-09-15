@@ -9,6 +9,7 @@ import { TIERS, scoreToTier, SPONSOR } from '../data/tiers'
 import { AD_SLOTS } from '../data/ads'
 import { trackEvent } from '../lib/analytics'
 import { t } from '../i18n/translations'
+import { DIAGNOSIS_MAX, QUIZ_MAX, formatDuration } from '../lib/scoring'
 
 const fadeUp = (delay = 0) => ({
   initial: { opacity: 0, y: 18 },
@@ -18,7 +19,10 @@ const fadeUp = (delay = 0) => ({
 
 export default function Diagnosis() {
   const quizScore = useGameStore((s) => s.quizScore)
+  const quizElapsedMs = useGameStore((s) => s.quizElapsedMs)
   const reactionScore = useGameStore((s) => s.reactionScore)
+  const reactionAvgMs = useGameStore((s) => s.reactionAvgMs)
+  const reactionElapsedMs = useGameStore((s) => s.reactionElapsedMs)
   const diagnosisTier = useGameStore((s) => s.diagnosisTier)
   const setDiagnosisTier = useGameStore((s) => s.setDiagnosisTier)
   const setScreen = useGameStore((s) => s.setScreen)
@@ -78,7 +82,12 @@ export default function Diagnosis() {
         <motion.div {...fadeUp(0.4)}>
           <BrainRotMeter tier={diagnosisTier} label={t(language, 'brainRotLevel')} />
           <p className="diag-score-row">
-            {t(language, 'quizScore')} {quizScore}/21 &nbsp;·&nbsp; {t(language, 'reaction')} +{reactionScore} &nbsp;·&nbsp; {t(language, 'total')} {totalScore}/30
+            {t(language, 'quizScore')} {quizScore}/{QUIZ_MAX}
+            {quizElapsedMs ? ` · ${formatDuration(quizElapsedMs)}` : ''}
+            &nbsp;·&nbsp; {t(language, 'reaction')} +{reactionScore}
+            {reactionAvgMs ? ` · ${t(language, 'avgReaction').replace('{ms}', reactionAvgMs)}` : ''}
+            {reactionElapsedMs ? ` · ${formatDuration(reactionElapsedMs)}` : ''}
+            &nbsp;·&nbsp; {t(language, 'total')} {totalScore}/{DIAGNOSIS_MAX}
           </p>
         </motion.div>
 

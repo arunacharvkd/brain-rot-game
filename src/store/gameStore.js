@@ -3,15 +3,20 @@ import { persist } from 'zustand/middleware'
 import { trackEvent, trackGameStart, trackGameComplete } from '../lib/analytics'
 import { getScreenFromPath } from '../lib/routes'
 import { applyDailyComplete } from '../lib/daily'
+import { betterArcadeRun, clampInt } from '../lib/scoring'
 
 const useGameStore = create(
   persist(
     (set, get) => ({
       screen: typeof window !== 'undefined' ? getScreenFromPath(window.location.pathname) : 'landing',
       quizScore: 0,
+      quizElapsedMs: 0,
       reactionScore: 0,
+      reactionAvgMs: 0,
+      reactionElapsedMs: 0,
       diagnosisTier: 0,
       arcadeScores: {},
+      arcadeTimes: {},
       finalTier: 0,
       muted: false,
       language: 'en',
@@ -32,16 +37,31 @@ const useGameStore = create(
           }
           return { screen }
         }),
-      setQuizScore: (quizScore) => set({ quizScore }),
-      setReactionScore: (reactionScore) => set({ reactionScore }),
+      setQuizScore: (quizScore, quizElapsedMs = 0) =>
+        set({
+          quizScore: clampInt(quizScore, 0, 21),
+          quizElapsedMs: Math.max(0, Math.round(Number(quizElapsedMs) || 0)),
+        }),
+      setReactionScore: (reactionScore, reactionAvgMs = 0, reactionElapsedMs = 0) =>
+        set({
+          reactionScore: clampInt(reactionScore, 0, 9),
+          reactionAvgMs: Math.max(0, Math.round(Number(reactionAvgMs) || 0)),
+          reactionElapsedMs: Math.max(0, Math.round(Number(reactionElapsedMs) || 0)),
+        }),
       setDiagnosisTier: (diagnosisTier) => set({ diagnosisTier }),
-      setArcadeScore: (id, score) =>
+      setArcadeScore: (id, score, elapsedMs = 0) =>
         set((s) => {
           const previousBest = s.arcadeScores[id]
+          const prevMs = s.arcadeTimes?.[id]
           const nextBest = Math.max(score, previousBest ?? 0)
-          trackGameComplete(id, score, previousBest)
+          const keepTime = betterArcadeRun(previousBest, prevMs, score, elapsedMs)
+          trackGameComplete(id, score, previousBest, elapsedMs)
           const next = {
             arcadeScores: { ...s.arcadeScores, [id]: nextBest },
+            arcadeTimes: {
+              ...(s.arcadeTimes || {}),
+              [id]: keepTime ? Math.max(0, Math.round(Number(elapsedMs) || 0)) : prevMs,
+            },
           }
           if (s.dailyMode) {
             next.daily = applyDailyComplete(s.daily, id, score)
@@ -78,9 +98,13 @@ const useGameStore = create(
         set({
           challenge,
           quizScore: 0,
+          quizElapsedMs: 0,
           reactionScore: 0,
+          reactionAvgMs: 0,
+          reactionElapsedMs: 0,
           diagnosisTier: 0,
           arcadeScores: {},
+          arcadeTimes: {},
           finalTier: 0,
           dailyMode: false,
           screen: 'quiz',
@@ -91,9 +115,13 @@ const useGameStore = create(
         set({
           screen: 'landing',
           quizScore: 0,
+          quizElapsedMs: 0,
           reactionScore: 0,
+          reactionAvgMs: 0,
+          reactionElapsedMs: 0,
           diagnosisTier: 0,
           arcadeScores: {},
+          arcadeTimes: {},
           finalTier: 0,
           dailyMode: false,
           challenge: null,
@@ -102,9 +130,13 @@ const useGameStore = create(
         set({
           screen: 'landing',
           quizScore: 0,
+          quizElapsedMs: 0,
           reactionScore: 0,
+          reactionAvgMs: 0,
+          reactionElapsedMs: 0,
           diagnosisTier: 0,
           arcadeScores: {},
+          arcadeTimes: {},
           finalTier: 0,
           dailyMode: false,
           challenge: null,
@@ -116,9 +148,13 @@ const useGameStore = create(
       name: 'brain-rot-save',
       partialize: (s) => ({
         quizScore: s.quizScore,
+        quizElapsedMs: s.quizElapsedMs,
         reactionScore: s.reactionScore,
+        reactionAvgMs: s.reactionAvgMs,
+        reactionElapsedMs: s.reactionElapsedMs,
         diagnosisTier: s.diagnosisTier,
         arcadeScores: s.arcadeScores,
+        arcadeTimes: s.arcadeTimes,
         finalTier: s.finalTier,
         muted: s.muted,
         language: s.language,
