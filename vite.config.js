@@ -4,23 +4,51 @@ import { VitePWA } from 'vite-plugin-pwa'
 import feedbackHandler from './api/feedback.js'
 import ogHandler from './api/og.js'
 import shareHandler from './api/share.js'
+import pushHandler from './api/push.js'
+import pushTickHandler from './api/push-tick.js'
 
 function parseQuery(url) {
   return Object.fromEntries(new URL(url, 'http://localhost').searchParams)
 }
 
+function attachGrowthApis(middlewares) {
+  middlewares.use((req, res, next) => {
+    const pathOnly = (req.url || '').split('?')[0]
+    if (pathOnly === '/api/push' || pathOnly === '/api/push-tick') {
+      req.query = parseQuery(req.url)
+      const run = async () => {
+        try {
+          if (req.method === 'POST' && pathOnly === '/api/push') {
+            req.body = await readJsonBody(req)
+          }
+          const handler = pathOnly === '/api/push' ? pushHandler : pushTickHandler
+          await handler(req, res)
+        } catch {
+          if (!res.writableEnded) {
+            res.statusCode = 500
+            res.setHeader('Content-Type', 'application/json')
+            res.end(JSON.stringify({ error: 'Push API error' }))
+          }
+        }
+      }
+      run()
+      return
+    }
+    const handler = pathOnly === '/api/og' ? ogHandler : pathOnly === '/s' ? shareHandler : null
+    if (!handler || (req.method !== 'GET' && req.method !== 'HEAD')) return next()
+    req.query = parseQuery(req.url)
+    handler(req, res)
+  })
+}
+
 function growthApiDevPlugin() {
   return {
     name: 'growth-api-dev',
-    apply: 'serve',
     configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        const pathOnly = (req.url || '').split('?')[0]
-        const handler = pathOnly === '/api/og' ? ogHandler : pathOnly === '/s' ? shareHandler : null
-        if (!handler || (req.method !== 'GET' && req.method !== 'HEAD')) return next()
-        req.query = parseQuery(req.url)
-        handler(req, res)
-      })
+      attachGrowthApis(server.middlewares)
+    },
+    configurePreviewServer(server) {
+      attachGrowthApis(server.middlewares)
     },
   }
 }
@@ -91,7 +119,13 @@ export default defineConfig(({ mode }) => {
       growthApiDevPlugin(),
       VitePWA({
         registerType: 'autoUpdate',
+        strategies: 'injectManifest',
+        srcDir: 'src',
+        filename: 'sw.js',
         includeAssets: ['favicon-64.png', 'apple-touch-icon.png', 'brc-logo.jpg', 'brc-logo-sm.jpg'],
+        injectManifest: {
+          globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,webp,woff2}'],
+        },
         workbox: {
           cleanupOutdatedCaches: true,
           clientsClaim: true,
@@ -180,6 +214,7 @@ export default defineConfig(({ mode }) => {
         },
         devOptions: {
           enabled: true,
+          type: 'module',
         },
       }),
     ],

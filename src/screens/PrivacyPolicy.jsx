@@ -3,7 +3,7 @@ import useGameStore from '../store/gameStore'
 import NeonButton from '../components/NeonButton'
 import { t } from '../i18n/translations'
 
-const LAST_UPDATED = 'September 11, 2026'
+const LAST_UPDATED = 'September 15, 2026'
 
 export default function PrivacyPolicy() {
   const setScreen = useGameStore((s) => s.setScreen)
@@ -46,6 +46,29 @@ export default function PrivacyPolicy() {
           <p>
             Game progress (quiz scores, reaction times, game scores) is stored only in your own
             browser's <strong>localStorage</strong> and never transmitted to our servers.
+          </p>
+        </section>
+
+        <section className="privacy-section">
+          <h2>Daily drill reminders</h2>
+          <p>
+            Reminders are <strong>opt-in</strong>. We do not turn them on unless you tap
+            “Turn on reminder”. You can turn them off at any time in the same card.
+          </p>
+          <p>
+            If you opt in, your browser may ask for <strong>notification permission</strong>.
+            That permission stays on your device. We do not use notifications to identify a person.
+          </p>
+          <p>
+            If lock-screen delivery is available, we store only an <strong>anonymous Web Push
+            subscription</strong>: the push service endpoint and its encryption keys, plus the
+            hour and timezone name needed to send a daily ping. We do <strong>not</strong> collect
+            your name, email, phone number, or any profile. We do not use this to identify a person.
+          </p>
+          <p>
+            Your preferred local hour is also saved in this browser’s <strong>localStorage</strong>.
+            If push cannot fire (for example on iPhone until BrainRotChecker is added to the Home
+            Screen), we may show an in-app nudge the next time you open the app.
           </p>
         </section>
 

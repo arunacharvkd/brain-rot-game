@@ -8,6 +8,8 @@ import { AD_SLOTS } from '../data/ads'
 import { MIN_GAMES_FOR_RESULTS } from '../data/tiers'
 import { t } from '../i18n/translations'
 import DailyDrillCard from '../components/DailyDrillCard'
+import DailyReminderCard from '../components/DailyReminderCard'
+import DailyNudge from '../components/DailyNudge'
 
 export default function ArcadeHub() {
   const setScreen = useGameStore((s) => s.setScreen)
@@ -69,7 +71,9 @@ export default function ArcadeHub() {
           </div>
         </motion.div>
 
+        <DailyNudge />
         <DailyDrillCard compact />
+        <DailyReminderCard compact />
 
         {/* Game grid */}
         <div className="arcade-grid">

@@ -8,5 +8,11 @@
       "source": "/((?!ads.txt|robots.txt|sitemap.xml|api/).*)",
       "destination": "/index.html"
     }
+  ],
+  "crons": [
+    {
+      "path": "/api/push-tick",
+      "schedule": "0 * * * *"
+    }
   ]
 }
