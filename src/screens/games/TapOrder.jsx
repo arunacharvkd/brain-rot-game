@@ -7,6 +7,8 @@ import GameDone from '../../components/GameDone'
 import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
+import { arcadeScore, runSummaryCopy } from '../../lib/scoring'
+import { usePlayClock } from '../../hooks/usePlayClock'
 
 const TOTAL = 8
 const Q_TIME = 7
@@ -34,20 +36,27 @@ export default function TapOrder() {
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
+  const clock = usePlayClock()
+  const correctRef = useRef(0)
+  const [run, setRun] = useState(null)
 
   const finishRound = useCallback((success) => {
     if (locked) return
     setLocked(true)
     if (success) play('ding'); else play('buzz')
 
-    const gained = success ? 12 + timeLeft * 2 : 0
-    const newScore = score + gained
-    setScore(newScore)
+    const nextCorrect = correctRef.current + (success ? 1 : 0)
+    correctRef.current = nextCorrect
+    setScore(arcadeScore({ id: 'order', accuracy: nextCorrect, elapsedMs: clock.elapsed() }).total)
 
     setTimeout(() => {
       if (qIndex + 1 >= TOTAL) {
+        const elapsed = clock.elapsed()
+        const result = arcadeScore({ id: 'order', accuracy: nextCorrect, elapsedMs: elapsed })
+        setRun(result)
+        setScore(result.total)
         setPhase('done')
-        setArcadeScore('order', newScore)
+        setArcadeScore('order', result.total, elapsed)
       } else {
         setQIndex((i) => i + 1)
         setCells(makeRound())
@@ -57,7 +66,7 @@ export default function TapOrder() {
         setLocked(false)
       }
     }, 500)
-  }, [locked, timeLeft, score, qIndex, play, setArcadeScore, setScreen])
+  }, [locked, qIndex, play, setArcadeScore, clock])
 
   useEffect(() => {
     if (phase !== 'playing' || locked) return
@@ -97,6 +106,8 @@ export default function TapOrder() {
     setNextExpected(1)
     setTimeLeft(Q_TIME)
     setScore(0)
+    correctRef.current = 0
+    setRun(null)
     setLocked(false)
     setSelected([])
   }
@@ -120,7 +131,7 @@ export default function TapOrder() {
             <p className="text-muted" style={{ marginBottom: 24, lineHeight: 1.6 }}>
               {t(language, 'orderIntroText').replace('{count}', TOTAL)}
             </p>
-            <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
+            <NeonButton onClick={() => { clock.start(); setPhase('playing') }} variant="purple" style={{ width: '100%' }}>
               {t(language, 'startButton')}
             </NeonButton>
           </div>
@@ -128,7 +139,9 @@ export default function TapOrder() {
           <GameDone
             emoji="🏁"
             title="Great Sequence!"
-            scoreLabel={`${score} pts`}
+            scoreLabel={run ? runSummaryCopy(t, language, run).scoreLabel : `${score} pts`}
+            timeLabel={run ? runSummaryCopy(t, language, run).timeLabel : undefined}
+            breakdown={run ? runSummaryCopy(t, language, run).breakdown : undefined}
             onContinue={() => useGameStore.getState().exitToHub()}
             onPlayAgain={handlePlayAgain}
           />

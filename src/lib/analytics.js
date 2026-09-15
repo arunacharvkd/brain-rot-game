@@ -53,7 +53,7 @@ export function trackGameStart(screenName, fromScreen) {
   })
 }
 
-export function trackGameComplete(gameId, score, previousBest) {
+export function trackGameComplete(gameId, score, previousBest, elapsedMs) {
   const bestScore = Math.max(score, previousBest ?? 0)
 
   trackEvent('game_complete', {
@@ -61,6 +61,7 @@ export function trackGameComplete(gameId, score, previousBest) {
     game_name: GAME_NAMES[gameId] || gameId,
     score,
     best_score: bestScore,
+    elapsed_ms: elapsedMs,
     is_new_best: previousBest === undefined ? 1 : score > previousBest ? 1 : 0,
     first_play: previousBest === undefined ? 1 : 0,
   })

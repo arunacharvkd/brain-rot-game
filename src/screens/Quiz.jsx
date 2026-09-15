@@ -6,6 +6,8 @@ import { getQuestions } from '../data/questions'
 import { useSound } from '../hooks/useSound'
 import { trackEvent } from '../lib/analytics'
 import { t } from '../i18n/translations'
+import { quizOptionScore } from '../lib/scoring'
+import { usePlayClock } from '../hooks/usePlayClock'
 
 export default function Quiz() {
   const [qIndex, setQIndex] = useState(0)
@@ -16,11 +18,13 @@ export default function Quiz() {
   const setScreen = useGameStore((s) => s.setScreen)
   const language = useGameStore((s) => s.language)
   const questions = getQuestions(language)
+  const clock = usePlayClock()
 
   const question = questions[qIndex]
   const progressPct = (qIndex / questions.length) * 100
 
   useEffect(() => {
+    clock.start()
     trackEvent('quiz_started', { question_count: questions.length, language })
   }, [])
 
@@ -28,18 +32,21 @@ export default function Quiz() {
     if (selected !== null) return
     play('select')
     setSelected(optionIndex)
+    const pts = quizOptionScore(score)
 
     setTimeout(() => {
-      const next = runningTotal + score
+      const next = runningTotal + pts
       if (qIndex < questions.length - 1) {
         setRunningTotal(next)
         setQIndex((i) => i + 1)
         setSelected(null)
       } else {
-        setQuizScore(next)
+        const elapsed = clock.elapsed()
+        setQuizScore(next, elapsed)
         trackEvent('quiz_completed', {
           quiz_score: next,
           question_count: questions.length,
+          elapsed_ms: elapsed,
         })
         setScreen('reaction')
       }

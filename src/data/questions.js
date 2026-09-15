@@ -177,6 +177,7 @@ export function getQuestions(language) {
     text: translations[index] ?? question.text,
     options: question.options.map((option, optionIndex) => ({
       ...option,
+      score: Number(option.score) || 0,
       text: optionTranslations?.[index]?.[optionIndex] ?? option.text,
     })),
   }))

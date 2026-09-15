@@ -7,6 +7,8 @@ import GameDone from '../../components/GameDone'
 import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
+import { arcadeScore, runSummaryCopy } from '../../lib/scoring'
+import { usePlayClock } from '../../hooks/usePlayClock'
 
 const TOTAL = 20
 const Q_TIME = 3 // seconds per question
@@ -40,24 +42,34 @@ export default function SpeedMath() {
   const [score, setScore] = useState(0)
   const [feedback, setFeedback] = useState(null) // null | 'correct' | 'wrong'
   const [locked, setLocked] = useState(false)
+  const [correctCount, setCorrectCount] = useState(0)
+  const [run, setRun] = useState(null)
   const { play } = useSound()
   const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
+  const clock = usePlayClock()
+  const correctRef = useRef(0)
 
   const advance = useCallback((correct) => {
     if (locked) return
     setLocked(true)
-    const newScore = score + (correct ? 10 : 0)
+    const nextCorrect = correctRef.current + (correct ? 1 : 0)
+    correctRef.current = nextCorrect
     if (correct) play('ding'); else play('buzz')
     setFeedback(correct ? 'correct' : 'wrong')
-    setScore(newScore)
+    setCorrectCount(nextCorrect)
+    setScore(arcadeScore({ id: 'math', accuracy: nextCorrect, elapsedMs: clock.elapsed() }).total)
 
     setTimeout(() => {
       if (qIndex + 1 >= TOTAL) {
+        const elapsed = clock.elapsed()
+        const result = arcadeScore({ id: 'math', accuracy: nextCorrect, elapsedMs: elapsed })
+        setRun(result)
+        setScore(result.total)
         setPhase('done')
-        setArcadeScore('math', newScore)
+        setArcadeScore('math', result.total, elapsed)
       } else {
         setQIndex((i) => i + 1)
         setQuestion(makeQuestion())
@@ -66,7 +78,7 @@ export default function SpeedMath() {
         setLocked(false)
       }
     }, 500)
-  }, [locked, score, qIndex, play, setArcadeScore, setScreen])
+  }, [locked, qIndex, play, setArcadeScore, clock])
 
   const handlePlayAgain = () => {
     clearTimeout(navTimerRef.current)
@@ -75,6 +87,9 @@ export default function SpeedMath() {
     setQuestion(makeQuestion())
     setTimeLeft(Q_TIME)
     setScore(0)
+    setCorrectCount(0)
+    correctRef.current = 0
+    setRun(null)
     setFeedback(null)
     setLocked(false)
   }
@@ -119,7 +134,7 @@ export default function SpeedMath() {
               {t(language, 'speedIntroText').replace('{count}', TOTAL).replace('{seconds}', Q_TIME)}
             </p>
             <NeonButton
-              onClick={() => { setPhase('playing'); setTimeLeft(Q_TIME) }}
+              onClick={() => { clock.start(); setPhase('playing'); setTimeLeft(Q_TIME) }}
               variant="purple"
               style={{ width: '100%' }}
             >
@@ -130,7 +145,9 @@ export default function SpeedMath() {
           <GameDone
             emoji="🧮"
             title="Done!"
-            scoreLabel={`${score} / ${TOTAL * 10} pts`}
+            scoreLabel={run ? runSummaryCopy(t, language, run).scoreLabel : `${score} pts`}
+            timeLabel={run ? runSummaryCopy(t, language, run).timeLabel : undefined}
+            breakdown={run ? runSummaryCopy(t, language, run).breakdown : undefined}
             onContinue={() => useGameStore.getState().exitToHub()}
             onPlayAgain={handlePlayAgain}
           />

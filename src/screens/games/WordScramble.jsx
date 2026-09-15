@@ -7,6 +7,8 @@ import GameDone from '../../components/GameDone'
 import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
+import { arcadeScore, runSummaryCopy } from '../../lib/scoring'
+import { usePlayClock } from '../../hooks/usePlayClock'
 
 const WORD_LIST = [
   'FOCUS', 'BRAIN', 'LEARN', 'SLEEP', 'WATER', 'THINK', 'RELAX', 'CLEAR', 'QUIET', 'PEACE',
@@ -68,24 +70,32 @@ export default function WordScramble() {
   const [score, setScore] = useState(0)
   const [feedback, setFeedback] = useState(null)
   const [locked, setLocked] = useState(false)
+  const [run, setRun] = useState(null)
   const { play } = useSound()
   const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
+  const clock = usePlayClock()
+  const correctRef = useRef(0)
 
   const advance = useCallback((correct) => {
     if (locked) return
     setLocked(true)
-    const newScore = score + (correct ? 10 : 0)
+    const nextCorrect = correctRef.current + (correct ? 1 : 0)
+    correctRef.current = nextCorrect
     if (correct) play('ding'); else play('buzz')
     setFeedback(correct ? 'correct' : 'wrong')
-    setScore(newScore)
+    setScore(arcadeScore({ id: 'word', accuracy: nextCorrect, elapsedMs: clock.elapsed() }).total)
 
     setTimeout(() => {
       if (qIndex + 1 >= TOTAL) {
+        const elapsed = clock.elapsed()
+        const result = arcadeScore({ id: 'word', accuracy: nextCorrect, elapsedMs: elapsed })
+        setRun(result)
+        setScore(result.total)
         setPhase('done')
-        setArcadeScore('word', newScore)
+        setArcadeScore('word', result.total, elapsed)
       } else {
         usedWordsRef.current.add(round.word)
         setRound(makeRound(WORD_LIST, usedWordsRef.current))
@@ -95,7 +105,7 @@ export default function WordScramble() {
         setLocked(false)
       }
     }, 550)
-  }, [locked, score, qIndex, round, play, setArcadeScore, setScreen])
+  }, [locked, qIndex, round, play, setArcadeScore, clock])
 
   const handlePlayAgain = () => {
     clearTimeout(navTimerRef.current)
@@ -104,6 +114,8 @@ export default function WordScramble() {
     setQIndex(0)
     setTimeLeft(Q_TIME)
     setScore(0)
+    correctRef.current = 0
+    setRun(null)
     setFeedback(null)
     setLocked(false)
     setPhase('intro')
@@ -148,7 +160,7 @@ export default function WordScramble() {
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
               {t(language, 'wordIntroText').replace('{count}', TOTAL).replace('{seconds}', Q_TIME)}
             </p>
-            <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
+            <NeonButton onClick={() => { clock.start(); setPhase('playing') }} variant="purple" style={{ width: '100%' }}>
               {t(language, 'startButton')}
             </NeonButton>
           </div>
@@ -156,7 +168,9 @@ export default function WordScramble() {
           <GameDone
             emoji="📖"
             title="Word Master!"
-            scoreLabel={`${score} / ${TOTAL * 10} pts`}
+            scoreLabel={run ? runSummaryCopy(t, language, run).scoreLabel : `${score} pts`}
+            timeLabel={run ? runSummaryCopy(t, language, run).timeLabel : undefined}
+            breakdown={run ? runSummaryCopy(t, language, run).breakdown : undefined}
             onContinue={() => useGameStore.getState().exitToHub()}
             onPlayAgain={handlePlayAgain}
           />

@@ -614,7 +614,31 @@ a { color: inherit; text-decoration: none; }
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.82rem;
   color: var(--text-muted);
-  margin-bottom: 28px;
+  margin-bottom: 8px;
+}
+.results-time {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+.results-run-list {
+  list-style: none;
+  margin: 0 0 24px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+.results-run-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  padding-bottom: 6px;
 }
 
 /* ── Landing screen base ───────────────────────────────── */
@@ -1967,7 +1991,12 @@ a { color: inherit; text-decoration: none; }
   color: var(--green);
   font-weight: 700;
 }
-.game-done-note { font-size: 0.85rem; }
+.game-done-time {
+  font-size: 0.92rem;
+  color: var(--text);
+  font-weight: 600;
+}
+.game-done-breakdown { font-size: 0.8rem; }
 .daily-drill {
   display: flex;
   align-items: center;

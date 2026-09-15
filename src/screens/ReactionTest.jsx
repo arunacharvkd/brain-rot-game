@@ -6,16 +6,11 @@ import NeonButton from '../components/NeonButton'
 import { useSound } from '../hooks/useSound'
 import { trackEvent } from '../lib/analytics'
 import { t } from '../i18n/translations'
+import { formatDuration, msToReactionRot } from '../lib/scoring'
+import { usePlayClock } from '../hooks/usePlayClock'
 
 const TOTAL_ROUNDS = 5
 const DISTRACTORS = ['📱', '🤡', '📺', '💀', '🎮']
-
-function msToScore(avg) {
-  if (avg < 300) return 0
-  if (avg < 500) return 3
-  if (avg < 700) return 6
-  return 9
-}
 
 export default function ReactionTest() {
   // phase: intro | countdown | waiting | target | result | complete
@@ -33,6 +28,10 @@ export default function ReactionTest() {
   const language = useGameStore((s) => s.language)
   const setReactionScore = useGameStore((s) => s.setReactionScore)
   const setScreen = useGameStore((s) => s.setScreen)
+  const clock = usePlayClock()
+  const [runAvg, setRunAvg] = useState(null)
+  const [runElapsed, setRunElapsed] = useState(null)
+  const [runRot, setRunRot] = useState(null)
 
   // Countdown 3-2-1 then switch to waiting
   useEffect(() => {
@@ -102,18 +101,23 @@ export default function ReactionTest() {
         setPhase('countdown')
       } else {
         const avg = newTimes.reduce((a, b) => a + b, 0) / newTimes.length
-        const reactionScore = msToScore(avg)
-        setReactionScore(reactionScore)
+        const reactionScore = msToReactionRot(avg)
+        const elapsed = clock.elapsed()
+        setReactionScore(reactionScore, Math.round(avg), elapsed)
+        setRunAvg(Math.round(avg))
+        setRunElapsed(elapsed)
+        setRunRot(reactionScore)
         trackEvent('reaction_test_completed', {
           rounds: TOTAL_ROUNDS,
           avg_reaction_ms: Math.round(avg),
           reaction_score: reactionScore,
+          elapsed_ms: elapsed,
         })
         setPhase('complete')
-        setTimeout(() => setScreen('diagnosis'), 900)
+        setTimeout(() => setScreen('diagnosis'), 1400)
       }
     }, 900)
-  }, [phase, times, roundIndex, play, setReactionScore, setScreen])
+  }, [phase, times, roundIndex, play, setReactionScore, setScreen, clock])
 
   return (
     <motion.div
@@ -231,8 +235,14 @@ export default function ReactionTest() {
                 animate={{ opacity: 1 }}
               >
                 <span style={{ fontSize: '2.5rem' }}>✅</span>
-                <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-                  {t(language, 'calculatingResults')}
+                <span className="text-mono" style={{ color: 'var(--green)', fontWeight: 700 }}>
+                  {runRot != null ? `+${runRot}` : ''}
+                </span>
+                <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                  {runAvg != null
+                    ? t(language, 'avgReaction').replace('{ms}', runAvg)
+                    : t(language, 'calculatingResults')}
+                  {runElapsed != null ? ` · ${formatDuration(runElapsed)}` : ''}
                 </span>
               </motion.div>
             )}
@@ -255,6 +265,7 @@ export default function ReactionTest() {
           {phase === 'intro' && (
             <NeonButton onClick={() => {
               trackEvent('reaction_test_started', { rounds: TOTAL_ROUNDS })
+              clock.start()
               setCountdown(3)
               setPhase('countdown')
             }} variant="purple">
@@ -273,7 +284,7 @@ export default function ReactionTest() {
           )}
 
           <p className="text-muted text-xs text-mono" style={{ marginTop: 12 }}>
-            {t(language, 'roundLabel').replace('{current}', Math.min(roundIndex + 1, TOTAL_ROUNDS)).replace('{total}', TOTAL_ROUNDS)}
+            {(t(language, 'reactionRound') || t(language, 'roundLabel')).replace('{current}', Math.min(roundIndex + 1, TOTAL_ROUNDS)).replace('{total}', TOTAL_ROUNDS)}
           </p>
         </div>
       </GlassCard>

@@ -7,6 +7,8 @@ import GameDone from '../../components/GameDone'
 import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
+import { arcadeScore, runSummaryCopy } from '../../lib/scoring'
+import { usePlayClock } from '../../hooks/usePlayClock'
 
 const BUTTONS = [
   { color: '#ef4444', label: '🔴' },
@@ -32,6 +34,8 @@ export default function PatternSimon() {
   const [activeBtn, setActiveBtn] = useState(-1)
   const [round, setRound] = useState(0)
   const [score, setScore] = useState(0)
+  const [run, setRun] = useState(null)
+  const [roundsWon, setRoundsWon] = useState(0)
   const timersRef = useRef([])
   const { play } = useSound()
   const language = useGameStore((s) => s.language)
@@ -39,6 +43,8 @@ export default function PatternSimon() {
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
   const lastStartRef = useRef('')
+  const clock = usePlayClock()
+  const roundsWonRef = useRef(0)
 
   const clearTimers = () => {
     timersRef.current.forEach(clearTimeout)
@@ -89,6 +95,11 @@ export default function PatternSimon() {
     lastStartRef.current = signature
     setSequence(first)
     setRound(1)
+    setScore(0)
+    setRun(null)
+    setRoundsWon(0)
+    roundsWonRef.current = 0
+    clock.start()
     setTimeout(() => showSequence(first), 400)
   }
 
@@ -100,22 +111,30 @@ export default function PatternSimon() {
     const pos = newPlayer.length - 1
 
     if (newPlayer[pos] !== sequence[pos]) {
-      // Wrong
       play('buzz')
+      const elapsed = clock.elapsed()
+      const result = arcadeScore({ id: 'simon', accuracy: roundsWonRef.current, elapsedMs: elapsed })
+      setRun(result)
+      setScore(result.total)
       setPhase('wrong')
-      setArcadeScore('simon', score)
+      setArcadeScore('simon', result.total, elapsed)
       return
     }
 
     if (newPlayer.length === sequence.length) {
-      // Correct round complete
       play('ding')
-      const newScore = score + sequence.length * 10
-      setScore(newScore)
+      const won = roundsWonRef.current + 1
+      roundsWonRef.current = won
+      setRoundsWon(won)
+      const preview = arcadeScore({ id: 'simon', accuracy: won, elapsedMs: clock.elapsed() })
+      setScore(preview.total)
       if (sequence.length >= MAX_ROUNDS + 2) {
-        // Game complete
+        const elapsed = clock.elapsed()
+        const result = arcadeScore({ id: 'simon', accuracy: won, elapsedMs: elapsed })
+        setRun(result)
+        setScore(result.total)
         setPhase('done')
-        setArcadeScore('simon', newScore)
+        setArcadeScore('simon', result.total, elapsed)
       } else {
         setPhase('win_round')
         setTimeout(() => startRound(sequence), 900)
@@ -133,6 +152,9 @@ export default function PatternSimon() {
     setActiveBtn(-1)
     setRound(0)
     setScore(0)
+    setRun(null)
+    setRoundsWon(0)
+    roundsWonRef.current = 0
     setPhase('intro')
   }
 
@@ -172,7 +194,7 @@ export default function PatternSimon() {
         ) : (
           <>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, marginBottom: 20 }}>
-              <span className="text-mono text-sm text-muted">{t(language, 'roundLabel').replace('{count}', displayRound)}</span>
+              <span className="text-mono text-sm text-muted">{t(language, 'simonRound').replace('{count}', displayRound)}</span>
               <span className="text-mono text-sm" style={{ color: 'var(--green)' }}>
                 {t(language, 'scoreLabel').replace('{score}', score)}
               </span>
@@ -230,7 +252,9 @@ export default function PatternSimon() {
                     <GameDone
                       emoji={phase === 'done' ? '🏆' : '💡'}
                       title={phase === 'done' ? t(language, 'simonSequenceMaster') : t(language, 'simonReached').replace('{count}', displayRound)}
-                      scoreLabel={t(language, 'memoryIntroScore').replace('{score}', score)}
+                      scoreLabel={run ? runSummaryCopy(t, language, run).scoreLabel : t(language, 'memoryIntroScore').replace('{score}', score)}
+                      timeLabel={run ? runSummaryCopy(t, language, run).timeLabel : undefined}
+                      breakdown={run ? runSummaryCopy(t, language, run).breakdown : undefined}
                       onContinue={() => useGameStore.getState().exitToHub()}
                       onPlayAgain={handlePlayAgain}
                     />

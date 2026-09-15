@@ -7,6 +7,8 @@ import GameDone from '../../components/GameDone'
 import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
+import { arcadeScore, runSummaryCopy } from '../../lib/scoring'
+import { usePlayClock } from '../../hooks/usePlayClock'
 
 const TOTAL = 12
 const Q_TIME = 4
@@ -56,20 +58,27 @@ export default function OddOneOut() {
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
   const lastOddIndexRef = useRef(-1)
+  const clock = usePlayClock()
+  const correctRef = useRef(0)
+  const [run, setRun] = useState(null)
 
   const advance = useCallback((correct) => {
     if (locked) return
     setLocked(true)
     if (correct) play('ding'); else play('buzz')
 
-    const gained = correct ? 8 + timeLeft * 2 : 0
-    const newScore = score + gained
-    setScore(newScore)
+    const nextCorrect = correctRef.current + (correct ? 1 : 0)
+    correctRef.current = nextCorrect
+    setScore(arcadeScore({ id: 'odd', accuracy: nextCorrect, elapsedMs: clock.elapsed() }).total)
 
     setTimeout(() => {
       if (qIndex + 1 >= TOTAL) {
+        const elapsed = clock.elapsed()
+        const result = arcadeScore({ id: 'odd', accuracy: nextCorrect, elapsedMs: elapsed })
+        setRun(result)
+        setScore(result.total)
         setPhase('done')
-        setArcadeScore('odd', newScore)
+        setArcadeScore('odd', result.total, elapsed)
       } else {
         lastOddIndexRef.current = round.oddIndex
         setQIndex((i) => i + 1)
@@ -79,7 +88,7 @@ export default function OddOneOut() {
         setFlashId(null)
       }
     }, 420)
-  }, [locked, timeLeft, score, qIndex, play, setArcadeScore, setScreen, round.oddIndex])
+  }, [locked, qIndex, play, setArcadeScore, round.oddIndex, clock])
 
   useEffect(() => {
     if (phase !== 'playing' || locked) return
@@ -106,6 +115,8 @@ export default function OddOneOut() {
     setRound(makeRound())
     setTimeLeft(Q_TIME)
     setScore(0)
+    correctRef.current = 0
+    setRun(null)
     setLocked(false)
     setFlashId(null)
   }
@@ -129,7 +140,7 @@ export default function OddOneOut() {
             <p className="text-muted" style={{ marginBottom: 24, lineHeight: 1.6 }}>
               {t(language, 'oddIntroText').replace('{count}', TOTAL).replace('{seconds}', Q_TIME)}
             </p>
-            <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
+            <NeonButton onClick={() => { clock.start(); setPhase('playing') }} variant="purple" style={{ width: '100%' }}>
               {t(language, 'startButton')}
             </NeonButton>
           </div>
@@ -137,7 +148,9 @@ export default function OddOneOut() {
           <GameDone
             emoji="✅"
             title="Sharp Eyes!"
-            scoreLabel={`${score} pts`}
+            scoreLabel={run ? runSummaryCopy(t, language, run).scoreLabel : `${score} pts`}
+            timeLabel={run ? runSummaryCopy(t, language, run).timeLabel : undefined}
+            breakdown={run ? runSummaryCopy(t, language, run).breakdown : undefined}
             onContinue={() => useGameStore.getState().exitToHub()}
             onPlayAgain={handlePlayAgain}
           />

@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "check:growth": "node scripts/growth-lib-check.mjs",
-    "check:reminder": "node scripts/reminder-lib-check.mjs"
+    "check:reminder": "node scripts/reminder-lib-check.mjs",
+    "check:scoring": "node scripts/scoring-check.mjs"
   },
   "dependencies": {
     "canvas-confetti": "^1.9.3",

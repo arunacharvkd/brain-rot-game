@@ -14,6 +14,8 @@ import { trackEvent } from '../lib/analytics'
 import { t } from '../i18n/translations'
 import { buildRunPayload, shareAbsoluteUrl, whoMoreNpc } from '../lib/codec'
 import { renderResultCardBlob, resultShareText, shareResult } from '../lib/shareCard'
+import { formatDuration, sumArcadeScores, sumArcadeTimes } from '../lib/scoring'
+import { GAME_NAMES } from '../lib/analytics'
 
 function getVerdict(before, after) {
   if (after < before) {
@@ -45,8 +47,12 @@ const fadeUp = (delay = 0) => ({
 export default function FinalResults() {
   const diagnosisTier = useGameStore((s) => s.diagnosisTier)
   const arcadeScores = useGameStore((s) => s.arcadeScores)
+  const arcadeTimes = useGameStore((s) => s.arcadeTimes)
   const quizScore = useGameStore((s) => s.quizScore)
+  const quizElapsedMs = useGameStore((s) => s.quizElapsedMs)
   const reactionScore = useGameStore((s) => s.reactionScore)
+  const reactionAvgMs = useGameStore((s) => s.reactionAvgMs)
+  const reactionElapsedMs = useGameStore((s) => s.reactionElapsedMs)
   const setFinalTier = useGameStore((s) => s.setFinalTier)
   const setScreen = useGameStore((s) => s.setScreen)
   const finalTier = useGameStore((s) => s.finalTier)
@@ -62,8 +68,10 @@ export default function FinalResults() {
   const [friendName, setFriendName] = useState('Friend')
   const [progress, setProgress] = useState(null)
 
-  const totalScore = Object.values(arcadeScores).reduce((a, b) => a + b, 0)
+  const totalScore = sumArcadeScores(arcadeScores)
   const gamesPlayed = Object.keys(arcadeScores).length
+  const rehabMs = sumArcadeTimes(arcadeTimes)
+  const diagnoseMs = (Number(quizElapsedMs) || 0) + (Number(reactionElapsedMs) || 0)
 
   useEffect(() => {
     const computed = calcFinalTier(diagnosisTier, arcadeScores)
@@ -278,6 +286,24 @@ export default function FinalResults() {
           <span style={{ color: 'var(--green)', fontWeight: 700 }}>{totalScore} pts</span>
           <span style={{ color: 'var(--text-muted)', marginLeft: 12 }}>{t(language, 'across')} {gamesPlayed} {gamesPlayed === 1 ? t(language, 'game') : t(language, 'games')}</span>
         </motion.p>
+        <motion.p className="results-time text-mono" {...fadeUp(0.38)}>
+          {t(language, 'resultsTime').replace('{time}', formatDuration(rehabMs))}
+          {diagnoseMs ? ` · ${t(language, 'quizScore')} + ${t(language, 'reaction')} ${formatDuration(diagnoseMs)}` : ''}
+          {reactionAvgMs ? ` · ${t(language, 'avgReaction').replace('{ms}', reactionAvgMs)} (+${reactionScore})` : ''}
+        </motion.p>
+        {gamesPlayed > 0 && (
+          <motion.ul className="results-run-list" {...fadeUp(0.4)}>
+            {Object.keys(arcadeScores).map((id) => (
+              <li key={id}>
+                <span>{GAME_NAMES[id] || id}</span>
+                <span className="text-mono">
+                  {arcadeScores[id]} pts
+                  {arcadeTimes?.[id] != null ? ` · ${formatDuration(arcadeTimes[id])}` : ''}
+                </span>
+              </li>
+            ))}
+          </motion.ul>
+        )}
 
         {cardBlobUrl && (
           <motion.img

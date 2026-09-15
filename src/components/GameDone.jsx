@@ -6,6 +6,8 @@ export default function GameDone({
   emoji,
   title,
   scoreLabel,
+  timeLabel,
+  breakdown,
   note,
   onContinue,
   onPlayAgain,
@@ -19,6 +21,8 @@ export default function GameDone({
       {emoji ? <div className="game-done-emoji">{emoji}</div> : null}
       <h2 className="game-done-title">{title}</h2>
       {scoreLabel ? <p className="game-done-score text-mono">{scoreLabel}</p> : null}
+      {timeLabel ? <p className="game-done-time text-mono">{timeLabel}</p> : null}
+      {breakdown ? <p className="game-done-breakdown text-muted">{breakdown}</p> : null}
       {note ? <p className="game-done-note text-muted">{note}</p> : null}
       {dailyMode ? (
         <p className="game-done-note text-muted">{t(language, 'dailyLogged')}</p>

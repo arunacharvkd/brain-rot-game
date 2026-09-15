@@ -44,7 +44,7 @@ export default function PrivacyPolicy() {
             to use this site.
           </p>
           <p>
-            Game progress (quiz scores, reaction times, game scores) is stored only in your own
+            Game progress (quiz scores, reaction times, finish times, game scores) is stored only in your own
             browser's <strong>localStorage</strong> and never transmitted to our servers.
           </p>
         </section>

@@ -7,6 +7,8 @@ import GameDone from '../../components/GameDone'
 import ArcadeBack from '../../components/ArcadeBack'
 import { useSound } from '../../hooks/useSound'
 import { t } from '../../i18n/translations'
+import { arcadeScore, runSummaryCopy } from '../../lib/scoring'
+import { usePlayClock } from '../../hooks/usePlayClock'
 
 const EMOJIS = ['🧠', '📚', '💧', '🍎', '😴', '🌟', '⚡', '🎯']
 const TIME = 90
@@ -32,11 +34,13 @@ export default function MemoryMatch() {
   const [phase, setPhase] = useState('intro') // intro | playing | done
   const [locked, setLocked] = useState(false)
   const [score, setScore] = useState(0)
+  const [run, setRun] = useState(null)
   const { play } = useSound()
   const language = useGameStore((s) => s.language)
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
   const setScreen = useGameStore((s) => s.setScreen)
   const navTimerRef = useRef(null)
+  const clock = usePlayClock()
 
   // Timer
   useEffect(() => {
@@ -53,12 +57,14 @@ export default function MemoryMatch() {
 
   const finish = useCallback((pairs) => {
     if (phase === 'done') return
-    const s = pairs * 10 + Math.round(timeLeft * 0.5)
-    setScore(s)
+    const elapsed = clock.elapsed()
+    const result = arcadeScore({ id: 'memory', accuracy: pairs, elapsedMs: elapsed })
+    setScore(result.total)
+    setRun(result)
     setPhase('done')
     play('win')
-    setArcadeScore('memory', s)
-  }, [phase, timeLeft, play, setArcadeScore])
+    setArcadeScore('memory', result.total, elapsed)
+  }, [phase, play, setArcadeScore, clock])
 
   const handlePlayAgain = () => {
     clearTimeout(navTimerRef.current)
@@ -67,6 +73,7 @@ export default function MemoryMatch() {
     setMatchedCount(0)
     setTimeLeft(TIME)
     setScore(0)
+    setRun(null)
     setLocked(false)
     setPhase('intro')
   }
@@ -121,7 +128,7 @@ export default function MemoryMatch() {
             <p className="text-muted" style={{ marginBottom: 28, lineHeight: 1.6 }}>
               {t(language, 'memoryIntroText').replace('{seconds}', TIME)}
             </p>
-            <NeonButton onClick={() => setPhase('playing')} variant="purple" style={{ width: '100%' }}>
+            <NeonButton onClick={() => { clock.start(); setPhase('playing') }} variant="purple" style={{ width: '100%' }}>
               {t(language, 'startButton')}
             </NeonButton>
           </div>
@@ -181,7 +188,7 @@ export default function MemoryMatch() {
                     <GameDone
                       emoji="🎉"
                       title={matchedCount === EMOJIS.length ? 'All Pairs Found!' : `${matchedCount} Pairs Found`}
-                      scoreLabel={`Score: ${score} pts`}
+                      {...(run ? runSummaryCopy(t, language, run) : { scoreLabel: `Score: ${score} pts` })}
                       onContinue={() => useGameStore.getState().exitToHub()}
                       onPlayAgain={handlePlayAgain}
                     />

@@ -5,6 +5,9 @@ import useGameStore from '../store/gameStore'
 import EmojiItem from '../components/EmojiItem'
 import GameDone from '../components/GameDone'
 import { useSound } from '../hooks/useSound'
+import { usePlayClock } from '../hooks/usePlayClock'
+import { arcadeScore, runSummaryCopy } from '../lib/scoring'
+import { t } from '../i18n/translations'
 
 const GOOD = ['🧠', '📚', '💧', '🍎', '😴']
 const BAD  = ['📱', '💀', '📺', '🤡']
@@ -35,13 +38,20 @@ export default function Game() {
   const [roundPhase, setRoundPhase] = useState('playing')
   // Score pops: { id, value, x, y }
   const [pops, setPops] = useState([])
+  const [run, setRun] = useState(null)
   const scoreRef = useRef(0)
   const { play } = useSound()
   const setArcadeScore = useGameStore((s) => s.setArcadeScore)
+  const language = useGameStore((s) => s.language)
   const setScreen = useGameStore((s) => s.setScreen)
+  const clock = usePlayClock()
 
   // Sync score ref so callbacks always read fresh value
   useEffect(() => { scoreRef.current = score }, [score])
+
+  useEffect(() => {
+    if (round === 1 && roundPhase === 'playing') clock.start()
+  }, [round, roundPhase, clock])
 
   // Spawn items
   useEffect(() => {
@@ -90,14 +100,17 @@ export default function Game() {
         disableForReducedMotion: true,
       })
     }
-    setArcadeScore('focus', final)
+    const elapsed = clock.elapsed()
+    const result = arcadeScore({ id: 'focus', accuracy: Math.max(0, final), elapsedMs: elapsed })
+    setRun(result)
+    setArcadeScore('focus', result.total, elapsed)
   }, [roundPhase]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleHit = useCallback(
     (item) => {
       const delta = item.type === 'good' ? 10 : -5
       play(item.type === 'good' ? 'ding' : 'buzz')
-      setScore((s) => s + delta)
+      setScore((s) => Math.max(0, s + delta))
       setItems((prev) => prev.filter((i) => i.id !== item.id))
       // Floating score pop
       setPops((prev) => [
@@ -124,6 +137,7 @@ export default function Game() {
     setTimeLeft(ROUND_TIME)
     setRound(1)
     setPops([])
+    setRun(null)
     setRoundPhase('playing') // triggers done-effect cleanup, cancelling auto-nav
   }
 
@@ -229,7 +243,7 @@ export default function Game() {
             {roundPhase === 'done' && (
               <GameDone
                 title="🎉 REHAB COMPLETE"
-                scoreLabel={`Score: ${score} pts`}
+                {...(run ? runSummaryCopy(t, language, run) : { scoreLabel: `Score: ${score} pts` })}
                 onContinue={() => useGameStore.getState().exitToHub()}
                 onPlayAgain={handlePlayAgain}
               />
