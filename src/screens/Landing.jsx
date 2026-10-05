@@ -12,6 +12,7 @@ import { SPONSOR, SUPPORTING_SPONSORS } from '../data/tiers'
 import { AD_SLOTS } from '../data/ads'
 import { trackEvent } from '../lib/analytics'
 import { t, LANGUAGES } from '../i18n/translations'
+import { getGuideCards, getPageByScreen } from '../data/pages'
 
 function getSponsorMeta(item) {
   const url = (item.url || '').toLowerCase()
@@ -85,7 +86,8 @@ export default function Landing() {
             <div className="landing-links">
               <button onClick={() => scrollTo('home')}>{t(language, 'home')}</button>
               {/* <button onClick={() => scrollTo('install')}>{t(language, 'installApp')}</button> */}
-              <button onClick={() => scrollTo('about')}>{t(language, 'about')}</button>
+              <button onClick={() => setScreen('guides')}>{t(language, 'guides')}</button>
+              <button onClick={() => setScreen('about')}>{t(language, 'about')}</button>
               {(SPONSOR.active || activeSupportingSponsors.length > 0) && (
                 <button onClick={() => scrollTo('sponsor')}>Sponsor</button>
               )}
@@ -147,11 +149,24 @@ export default function Landing() {
                 {[
                   ['home', t(language, 'home')],
                   ['install', t(language, 'installApp')],
+                  ['guides', t(language, 'guides')],
                   ['about', t(language, 'about')],
                   ...(SPONSOR.active || activeSupportingSponsors.length > 0 ? [['sponsor', 'Sponsor']] : []),
                   ['contact', t(language, 'contact')],
                 ].map(([id, label]) => (
-                  <button key={id} onClick={() => scrollTo(id)}>
+                  <button key={id} onClick={() => {
+                    if (id === 'guides') {
+                      setMenuOpen(false)
+                      setScreen('guides')
+                      return
+                    }
+                    if (id === 'about') {
+                      setMenuOpen(false)
+                      setScreen('about')
+                      return
+                    }
+                    scrollTo(id)
+                  }}>
                     <span>{label}</span>
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
                   </button>
@@ -287,6 +302,29 @@ export default function Landing() {
           </div>
         </section>
 
+        <section id="guides" className="landing-section">
+          <div className="landing-block">
+            <h2>{t(language, 'guidesHeading')}</h2>
+            <p className="landing-block-intro">{t(language, 'guidesIntro')}</p>
+            <div className="content-cards">
+              {getGuideCards().map((card) => (
+                <a
+                  key={card.id}
+                  className="content-card"
+                  href={card.path}
+                  onClick={(event) => {
+                    event.preventDefault()
+                    setScreen(card.screen)
+                  }}
+                >
+                  <strong>{card.nav}</strong>
+                  <span>{card.summary}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section id="about" className="landing-section">
           <div className="landing-block">
             <h2>{t(language, 'productHeading')}</h2>
@@ -390,6 +428,18 @@ export default function Landing() {
                 <strong>{t(language, 'generalContact')}</strong>
                 <span>vkdarunacharya@gmail.com</span>
               </a>
+              <a
+                className="landing-contact-card"
+                href="/how-it-works"
+                onClick={(event) => {
+                  event.preventDefault()
+                  setScreen('how')
+                }}
+              >
+                <span className="landing-contact-icon" aria-hidden="true">📘</span>
+                <strong>{getPageByScreen('how').nav}</strong>
+                <span>{getPageByScreen('how').summary}</span>
+              </a>
               <button
                 className="landing-contact-card"
                 onClick={() => setScreen('privacy')}
@@ -409,6 +459,9 @@ export default function Landing() {
             <span>© 2026 Brain Rot Checker · {t(language, 'footerNote')}</span>
           </div>
           <div className="landing-page-footer-links">
+            <a href="/guides" onClick={(event) => { event.preventDefault(); setScreen('guides') }}>{t(language, 'guides')}</a>
+            <a href="/about" onClick={(event) => { event.preventDefault(); setScreen('about') }}>{t(language, 'about')}</a>
+            <a href="/faq" onClick={(event) => { event.preventDefault(); setScreen('faq') }}>FAQ</a>
             <button onClick={() => setScreen('privacy')}>{t(language, 'privacyPolicy')}</button>
             <a href="mailto:vkdarunacharya@gmail.com">{t(language, 'contact')}</a>
           </div>

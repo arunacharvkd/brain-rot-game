@@ -2,9 +2,12 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url><loc>https://brainrotchecker.com/</loc></url>
   <url><loc>https://brainrotchecker.com/quiz</loc></url>
-  <url><loc>https://brainrotchecker.com/reaction</loc></url>
-  <url><loc>https://brainrotchecker.com/diagnosis</loc></url>
-  <url><loc>https://brainrotchecker.com/arcade</loc></url>
-  <url><loc>https://brainrotchecker.com/results</loc></url>
+  <url><loc>https://brainrotchecker.com/how-it-works</loc></url>
+  <url><loc>https://brainrotchecker.com/what-your-score-means</loc></url>
+  <url><loc>https://brainrotchecker.com/focus-practice</loc></url>
+  <url><loc>https://brainrotchecker.com/arcade-games</loc></url>
+  <url><loc>https://brainrotchecker.com/guides</loc></url>
+  <url><loc>https://brainrotchecker.com/about</loc></url>
+  <url><loc>https://brainrotchecker.com/faq</loc></url>
   <url><loc>https://brainrotchecker.com/privacy</loc></url>
 </urlset>

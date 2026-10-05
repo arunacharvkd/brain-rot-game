@@ -13,7 +13,13 @@ clientsClaim()
 try {
   registerRoute(
     new NavigationRoute(createHandlerBoundToURL('index.html'), {
-      denylist: [/^\/api\//, /^\/s$/, /^\/ads\.txt$/, /^\/manifest\.webmanifest$/],
+      denylist: [
+        /^\/api\//,
+        /^\/s$/,
+        /^\/ads\.txt$/,
+        /^\/manifest\.webmanifest$/,
+        /^\/(guides|about|how-it-works|what-your-score-means|focus-practice|arcade-games|faq)\/?$/,
+      ],
     }),
   )
 } catch {

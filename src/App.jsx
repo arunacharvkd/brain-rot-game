@@ -14,6 +14,8 @@ import { trackEvent, trackScreenView } from './lib/analytics'
 import { LANGUAGES } from './i18n/translations'
 import { getPathFromScreen, getScreenFromPath } from './lib/routes'
 import { ensureAdSenseScript, isAdSenseReady } from './data/ads'
+import { getPageByScreen, SITE } from './data/pages'
+import ContentPage from './screens/ContentPage'
 import { decodePayload } from './lib/codec'
 import ShareView from './screens/ShareView'
 import ChallengeBanner from './components/ChallengeBanner'
@@ -46,6 +48,13 @@ const SCREENS = {
   results:        FinalResults,
   privacy:        PrivacyPolicy,
   shared:         ShareView,
+  guides:         ContentPage,
+  about:          ContentPage,
+  how:            ContentPage,
+  score:          ContentPage,
+  practice:       ContentPage,
+  'games-guide':  ContentPage,
+  faq:            ContentPage,
 }
 
 export default function App() {
@@ -84,6 +93,17 @@ export default function App() {
 
   useEffect(() => {
     trackScreenView(screen)
+  }, [screen])
+
+  useEffect(() => {
+    const page = getPageByScreen(screen)
+    document.title = page?.title ?? (screen === 'privacy' ? 'Privacy Policy — BrainRotChecker' : SITE.defaultTitle)
+    const description = document.querySelector('meta[name="description"]')
+    if (!description) return
+    description.setAttribute(
+      'content',
+      page?.description ?? SITE.defaultDescription
+    )
   }, [screen])
 
   useEffect(() => {

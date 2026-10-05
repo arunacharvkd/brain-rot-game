@@ -1,6 +1,9 @@
 import useGameStore from '../store/gameStore'
 import BrandMark from './BrandMark'
 import { t } from '../i18n/translations'
+import { getPageByScreen } from '../data/pages'
+
+const FOOTER_PAGES = ['guides', 'about', 'faq'].map((screen) => getPageByScreen(screen))
 
 export default function Footer() {
   const setScreen = useGameStore((s) => s.setScreen)
@@ -15,7 +18,21 @@ export default function Footer() {
         <span>© 2026 Brain Rot Checker · {t(language, 'footerNote')}</span>
       </div>
       <div className="global-footer-links">
-        <button role="link" onClick={() => setScreen('privacy')}>{t(language, 'privacyPolicy')}</button>
+        {FOOTER_PAGES.map((page) => (
+          <a
+            key={page.id}
+            href={page.path}
+            onClick={(event) => {
+              event.preventDefault()
+              setScreen(page.screen)
+            }}
+          >
+            {page.nav}
+          </a>
+        ))}
+        <a href="/privacy" onClick={(event) => { event.preventDefault(); setScreen('privacy') }}>
+          {t(language, 'privacyPolicy')}
+        </a>
         <a href="mailto:vkdarunacharya@gmail.com">{t(language, 'contact')}</a>
       </div>
     </footer>

@@ -16,6 +16,13 @@ export const SCREEN_PATHS = {
   'game-order': '/game/order',
   results: '/results',
   privacy: '/privacy',
+  guides: '/guides',
+  about: '/about',
+  how: '/how-it-works',
+  score: '/what-your-score-means',
+  practice: '/focus-practice',
+  'games-guide': '/arcade-games',
+  faq: '/faq',
 }
 
 const PATH_TO_SCREEN = Object.fromEntries(
