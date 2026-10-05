@@ -1,4 +1,8 @@
+import fs from 'node:fs'
+import path from 'node:path'
 import { defineConfig, loadEnv } from 'vite'
+import { allPrerenderPages } from './src/data/pages.js'
+import { renderPrerenderedHtml } from './src/lib/prerenderHtml.js'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import feedbackHandler from './api/feedback.js'
@@ -49,6 +53,28 @@ function growthApiDevPlugin() {
     },
     configurePreviewServer(server) {
       attachGrowthApis(server.middlewares)
+    },
+  }
+}
+
+function contentPrerenderPlugin() {
+  return {
+    name: 'content-prerender',
+    apply: 'build',
+    closeBundle() {
+      const indexPath = path.resolve('dist/index.html')
+      if (!fs.existsSync(indexPath)) return
+      const shell = fs.readFileSync(indexPath, 'utf8')
+      for (const page of allPrerenderPages()) {
+        const html = renderPrerenderedHtml(shell, page)
+        if (!page.path || page.path === '/') {
+          fs.writeFileSync(indexPath, html)
+          continue
+        }
+        const dir = path.resolve('dist', page.path.replace(/^\//, ''))
+        fs.mkdirSync(dir, { recursive: true })
+        fs.writeFileSync(path.join(dir, 'index.html'), html)
+      }
     },
   }
 }
@@ -115,6 +141,7 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [
       react(),
+      contentPrerenderPlugin(),
       feedbackApiDevPlugin(),
       growthApiDevPlugin(),
       VitePWA({
