@@ -16,7 +16,7 @@ const copy = {
     before: 'Before', afterRehab: 'After Rehab', totalScore: 'Total Score:',
     across: 'across', game: 'game', games: 'games',     share: 'Share card',
     copied: '✓ Copied!', playAgain: 'Play Again', copiedClipboard: '✓ Copied to clipboard', cooked: 'cooked',
-    home: 'Home', installApp: 'Install App', about: 'About', guides: 'Guides', contact: 'Contact', startTest: 'Start Test',
+    home: 'Home', installApp: 'Install App', about: 'About', guides: 'Guides', corporate: 'Corporate', contact: 'Contact', startTest: 'Start Test',
     guidesHeading: 'Read this before you trust the nickname',
     guidesIntro: 'The check is a habit quiz plus a five-round tap task. These pages explain the scoring, what each game asks you to do, and what the result does not mean. The guides are in English.',
     builtFor: 'Built for short-attention generation', heroTitle: 'Train your focus before your feed trains you.',

@@ -12,6 +12,7 @@ const useGameStore = create(
       reactionScore: 0,
       diagnosisTier: 0,
       arcadeScores: {},
+      corporateScores: {},
       finalTier: 0,
       muted: false,
       language: 'en',
@@ -48,6 +49,13 @@ const useGameStore = create(
           }
           return next
         }),
+      setCorporateScore: (id, score) =>
+        set((s) => {
+          const previousBest = s.corporateScores?.[id]
+          const nextBest = Math.max(score, previousBest ?? 0)
+          trackGameComplete(id, score, previousBest)
+          return { corporateScores: { ...(s.corporateScores || {}), [id]: nextBest } }
+        }),
       setFinalTier: (finalTier) => set({ finalTier }),
       toggleMute: () => set((s) => ({ muted: !s.muted })),
       setLanguage: (language) => set({ language }),
@@ -55,7 +63,7 @@ const useGameStore = create(
       clearDailyMode: () => set({ dailyMode: false }),
       exitToHub: () =>
         set((s) => ({
-          screen: s.dailyMode ? 'landing' : 'arcade',
+          screen: s.dailyMode ? 'landing' : (String(s.screen).startsWith('corp-') ? 'corporate' : 'arcade'),
           dailyMode: false,
         })),
       setChallenge: (challenge) => set({ challenge }),
@@ -81,6 +89,7 @@ const useGameStore = create(
           reactionScore: 0,
           diagnosisTier: 0,
           arcadeScores: {},
+          corporateScores: {},
           finalTier: 0,
           dailyMode: false,
           screen: 'quiz',
@@ -94,6 +103,7 @@ const useGameStore = create(
           reactionScore: 0,
           diagnosisTier: 0,
           arcadeScores: {},
+          corporateScores: {},
           finalTier: 0,
           dailyMode: false,
           challenge: null,
@@ -105,6 +115,7 @@ const useGameStore = create(
           reactionScore: 0,
           diagnosisTier: 0,
           arcadeScores: {},
+          corporateScores: {},
           finalTier: 0,
           dailyMode: false,
           challenge: null,
@@ -119,6 +130,7 @@ const useGameStore = create(
         reactionScore: s.reactionScore,
         diagnosisTier: s.diagnosisTier,
         arcadeScores: s.arcadeScores,
+        corporateScores: s.corporateScores,
         finalTier: s.finalTier,
         muted: s.muted,
         language: s.language,

@@ -87,6 +87,7 @@ export default function Landing() {
               <button onClick={() => scrollTo('home')}>{t(language, 'home')}</button>
               {/* <button onClick={() => scrollTo('install')}>{t(language, 'installApp')}</button> */}
               <button onClick={() => setScreen('guides')}>{t(language, 'guides')}</button>
+              <button onClick={() => setScreen('corporate')}>{t(language, 'corporate')}</button>
               <button onClick={() => setScreen('about')}>{t(language, 'about')}</button>
               {(SPONSOR.active || activeSupportingSponsors.length > 0) && (
                 <button onClick={() => scrollTo('sponsor')}>Sponsor</button>
@@ -150,19 +151,15 @@ export default function Landing() {
                   ['home', t(language, 'home')],
                   ['install', t(language, 'installApp')],
                   ['guides', t(language, 'guides')],
+                  ['corporate', t(language, 'corporate')],
                   ['about', t(language, 'about')],
                   ...(SPONSOR.active || activeSupportingSponsors.length > 0 ? [['sponsor', 'Sponsor']] : []),
                   ['contact', t(language, 'contact')],
                 ].map(([id, label]) => (
                   <button key={id} onClick={() => {
-                    if (id === 'guides') {
+                    if (id === 'guides' || id === 'corporate' || id === 'about') {
                       setMenuOpen(false)
-                      setScreen('guides')
-                      return
-                    }
-                    if (id === 'about') {
-                      setMenuOpen(false)
-                      setScreen('about')
+                      setScreen(id)
                       return
                     }
                     scrollTo(id)
@@ -299,6 +296,20 @@ export default function Landing() {
                 </a>
               </div>
             )}
+          </div>
+        </section>
+
+        <section id="corporate" className="landing-section">
+          <div className="landing-block">
+            <h2>Corporate drills</h2>
+            <p className="landing-block-intro">
+              A workplace set inside the same site: sort an inbox, order four tasks, and catch the number that does not add up. These rounds do not change the habit-check score.
+            </p>
+            <div className="landing-cta-row">
+              <NeonButton onClick={() => setScreen('corporate')} variant="outline">
+                Open corporate drills
+              </NeonButton>
+            </div>
           </div>
         </section>
 

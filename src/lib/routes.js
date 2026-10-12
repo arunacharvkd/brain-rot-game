@@ -23,6 +23,10 @@ export const SCREEN_PATHS = {
   practice: '/focus-practice',
   'games-guide': '/arcade-games',
   faq: '/faq',
+  corporate: '/corporate',
+  'corp-inbox': '/corporate/inbox',
+  'corp-priority': '/corporate/priority',
+  'corp-figures': '/corporate/figures',
 }
 
 const PATH_TO_SCREEN = Object.fromEntries(
@@ -34,6 +38,7 @@ export function getPathFromScreen(screen) {
 }
 
 export function getScreenFromPath(pathname) {
-  if (pathname === '/s') return 'shared'
-  return PATH_TO_SCREEN[pathname] ?? 'landing'
+  const path = pathname.length > 1 ? pathname.replace(/\/+$/, '') : pathname
+  if (path === '/s') return 'shared'
+  return PATH_TO_SCREEN[path] ?? 'landing'
 }

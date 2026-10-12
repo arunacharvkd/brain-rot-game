@@ -1,3 +1,5 @@
+import { CORPORATE_PRERENDER } from './corporate.js'
+
 export const SITE = {
   origin: 'https://brainrotchecker.com',
   defaultTitle: 'BrainRotChecker — Focus check and attention practice',
@@ -396,7 +398,7 @@ export function withRelatedLinks(page) {
 }
 
 export function allPrerenderPages() {
-  return [HOME_SUMMARY, ...PAGES.map(withRelatedLinks)]
+  return [HOME_SUMMARY, ...PAGES.map(withRelatedLinks), CORPORATE_PRERENDER]
 }
 
 export { byId }

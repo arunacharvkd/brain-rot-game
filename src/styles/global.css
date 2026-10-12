@@ -2009,6 +2009,83 @@ a { color: inherit; text-decoration: none; }
   .content-cards { grid-template-columns: 1fr; }
 }
 
+.corp-intro {
+  max-width: 720px;
+  color: var(--text-muted);
+  line-height: 1.65;
+  font-size: 0.92rem;
+}
+.corp-intro p { margin-bottom: 10px; }
+.corp-meta {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 8px 12px;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+.corp-meta .ghost-back { grid-column: 1 / -1; justify-self: start; }
+.corp-timer {
+  grid-column: 1 / -1;
+  height: 4px;
+  border-radius: 99px;
+  background: rgba(255,255,255,0.08);
+  overflow: hidden;
+}
+.corp-timer > div {
+  height: 100%;
+  background: var(--purple);
+}
+.corp-mail, .corp-task {
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: rgba(255,255,255,0.03);
+}
+.corp-mail { padding: 14px; margin-bottom: 12px; }
+.corp-kicker { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 4px; }
+.corp-subject { font-size: 1rem; font-weight: 750; margin-bottom: 6px; }
+.corp-mail p, .corp-task span, .corp-note, .corp-rule {
+  color: var(--text-muted);
+  line-height: 1.55;
+  font-size: 0.9rem;
+}
+.corp-choices, .corp-stack { display: grid; gap: 8px; }
+.corp-choices { grid-template-columns: 1fr 1fr; }
+.corp-choice, .corp-task, .corp-chip {
+  font: inherit;
+  color: var(--text);
+  cursor: pointer;
+}
+.corp-choice, .corp-task {
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  background: rgba(255,255,255,0.03);
+  padding: 12px;
+}
+.corp-task { display: flex; flex-direction: column; gap: 4px; }
+.corp-task strong { font-size: 0.92rem; }
+.corp-choice.is-good, .corp-task.is-good, .corp-chip.is-good { border-color: var(--green); }
+.corp-choice.is-bad, .corp-task.is-bad, .corp-chip.is-bad { border-color: #ef4444; }
+.corp-note, .corp-rule { margin-top: 10px; }
+.corp-sentence {
+  font-size: 1.05rem;
+  line-height: 1.8;
+  margin: 8px 0 4px;
+}
+.corp-chip {
+  display: inline-flex;
+  margin: 0 3px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+}
+@media (max-width: 520px) {
+  .corp-choices { grid-template-columns: 1fr; }
+}
+
 .game-done {
   display: flex;
   flex-direction: column;
