@@ -29,6 +29,10 @@ const WordScramble = lazy(() => import('./screens/games/WordScramble'))
 const ColourWord = lazy(() => import('./screens/games/ColourWord'))
 const OddOneOut = lazy(() => import('./screens/games/OddOneOut'))
 const TapOrder = lazy(() => import('./screens/games/TapOrder'))
+const CorporateHub = lazy(() => import('./screens/CorporateHub'))
+const InboxTriage = lazy(() => import('./screens/corporate/InboxTriage'))
+const PriorityOrder = lazy(() => import('./screens/corporate/PriorityOrder'))
+const FigureCheck = lazy(() => import('./screens/corporate/FigureCheck'))
 
 const SCREENS = {
   landing:        Landing,
@@ -45,6 +49,10 @@ const SCREENS = {
   'game-colour':  ColourWord,
   'game-odd':     OddOneOut,
   'game-order':   TapOrder,
+  corporate:      CorporateHub,
+  'corp-inbox':   InboxTriage,
+  'corp-priority': PriorityOrder,
+  'corp-figures': FigureCheck,
   results:        FinalResults,
   privacy:        PrivacyPolicy,
   shared:         ShareView,
@@ -72,7 +80,7 @@ export default function App() {
   const acceptChallenge = useGameStore((s) => s.acceptChallenge)
   const challenge = useGameStore((s) => s.challenge)
   const Screen = SCREENS[screen] ?? Landing
-  const isGameScreen = screen === 'game' || screen.startsWith('game-')
+  const isGameScreen = screen === 'game' || screen.startsWith('game-') || screen.startsWith('corp-')
   const isLandingScreen = screen === 'landing'
   const hasTrackedSessionRef = useRef(false)
   const incomingLinkRef = useRef(false)

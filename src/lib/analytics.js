@@ -8,6 +8,9 @@ export const GAME_NAMES = {
   colour: 'Colour vs Word',
   odd: 'Odd One Out',
   order: 'Tap Order',
+  inbox: 'Inbox triage',
+  priority: 'Priority order',
+  figures: 'Figure check',
 }
 
 const SCREEN_TO_GAME_ID = {
@@ -20,6 +23,9 @@ const SCREEN_TO_GAME_ID = {
   'game-colour': 'colour',
   'game-odd': 'odd',
   'game-order': 'order',
+  'corp-inbox': 'inbox',
+  'corp-priority': 'priority',
+  'corp-figures': 'figures',
 }
 
 function cleanParams(params) {

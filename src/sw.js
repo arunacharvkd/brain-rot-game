@@ -19,6 +19,7 @@ try {
         /^\/ads\.txt$/,
         /^\/manifest\.webmanifest$/,
         /^\/(guides|about|how-it-works|what-your-score-means|focus-practice|arcade-games|faq)\/?$/,
+        /^\/corporate(\/.*)?$/,
       ],
     }),
   )
